@@ -42,7 +42,6 @@
 #include <test_api/test_api.wast.hpp>
 #include <test_api/test_api.hpp>
 
-
 #include <eosio/chain/staked_balance_objects.hpp>
 //#include <eosio/chain/balance_object.hpp>
 
