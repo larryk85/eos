@@ -5,29 +5,20 @@
 #include <eoslib/eos.hpp>
 #include "test_api.hpp"
 
+#include "test_account.cpp"
 #include "test_action.cpp"
 #include "test_extended_memory.cpp"
 #include "test_memory.cpp"
 #include "test_print.cpp"
 #include "test_types.cpp"
-<<<<<<< HEAD
 //#include "test_string.cpp"
-//#include "test_fixedpoint.cpp"
+#include "test_fixedpoint.cpp"
 #include "test_math.cpp"
-//#include "test_account.cpp"
-//#include "test_chain.cpp"
+#include "test_compiler_builtins.cpp"
 //#include "test_crypto.cpp"
-//#include "test_db.cpp"
-=======
-//#include "test_fixedpoint.cpp"
-//#include "test_math.cpp"
-//#include "test_account.cpp"
 //#include "test_chain.cpp"
-//#include "test_crypto.cpp"
 //#include "test_db.cpp"
-//#include "test_string.cpp"
->>>>>>> ea0bb7cfedb3fbdaf331040030ff893bddaf3ac2
-//#include "test_real.cpp"
+#include "test_real.cpp"
 //#include "test_transaction.cpp"
 
 extern "C" {
@@ -46,6 +37,15 @@ extern "C" {
       WASM_TEST_HANDLER(test_types, char_to_symbol);
       WASM_TEST_HANDLER(test_types, string_to_name);
       WASM_TEST_HANDLER(test_types, name_class);
+#endif
+
+#if 1
+      //test_compiler_builtins
+      WASM_TEST_HANDLER(test_compiler_builtins, test_multi3);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_divti3);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_divti3_by_0);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_lshlti3);
+      //WASM_TEST_HANDLER(test_compiler_builtins, test_lshrti3);
 #endif
 
 #if 1
@@ -83,11 +83,7 @@ extern "C" {
       WASM_TEST_HANDLER(test_print, test_printi128);
       WASM_TEST_HANDLER(test_print, test_printn);
 
-<<<<<<< HEAD
 #if 1
-=======
-#if 0
->>>>>>> ea0bb7cfedb3fbdaf331040030ff893bddaf3ac2
       //test_math
       WASM_TEST_HANDLER(test_math, test_multeq);
       WASM_TEST_HANDLER(test_math, test_diveq);
@@ -180,12 +176,12 @@ extern "C" {
       WASM_TEST_HANDLER(test_string, print_null_terminated);
       WASM_TEST_HANDLER(test_string, print_non_null_terminated);
       WASM_TEST_HANDLER(test_string, print_unicode);
-      WASM_TEST_HANDLER(test_string, valid_utf8);
-      WASM_TEST_HANDLER(test_string, invalid_utf8);
-      WASM_TEST_HANDLER(test_string, string_literal);
+//      WASM_TEST_HANDLER(test_string, valid_utf8);
+//      WASM_TEST_HANDLER(test_string, invalid_utf8);
+//      WASM_TEST_HANDLER(test_string, string_literal);
 #endif
 
-#if 0
+#if 1
       // test fixed_point
       WASM_TEST_HANDLER(test_fixedpoint, create_instances);
       WASM_TEST_HANDLER(test_fixedpoint, test_addition);
@@ -194,7 +190,7 @@ extern "C" {
       WASM_TEST_HANDLER(test_fixedpoint, test_division);
 #endif
 
-#if 0
+#if 1
       // test double
       WASM_TEST_HANDLER(test_real, create_instances);
       WASM_TEST_HANDLER(test_real, test_addition);
@@ -202,7 +198,7 @@ extern "C" {
       WASM_TEST_HANDLER(test_real, test_division);
 #endif
 
-#if 0
+#if 1
       // test account
       WASM_TEST_HANDLER(test_account, test_balance_acc1);
 #endif
