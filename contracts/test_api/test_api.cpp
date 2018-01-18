@@ -11,10 +11,10 @@
 #include "test_memory.cpp"
 #include "test_print.cpp"
 #include "test_types.cpp"
-//#include "test_string.cpp"
 #include "test_fixedpoint.cpp"
 #include "test_math.cpp"
 #include "test_compiler_builtins.cpp"
+#include "test_string.cpp"
 //#include "test_crypto.cpp"
 //#include "test_chain.cpp"
 //#include "test_db.cpp"
@@ -157,7 +157,6 @@ extern "C" {
       WASM_TEST_HANDLER(test_chain, test_activeprods);
 #endif
 
-#if 0
       // test string
       WASM_TEST_HANDLER(test_string, construct_with_size);
       WASM_TEST_HANDLER(test_string, construct_with_data);
@@ -168,8 +167,9 @@ extern "C" {
       WASM_TEST_HANDLER(test_string, index_operator);
       WASM_TEST_HANDLER(test_string, index_out_of_bound);
       WASM_TEST_HANDLER(test_string, substring);
-      WASM_TEST_HANDLER(test_string, substring_out_of_bound);
+#if 0
       WASM_TEST_HANDLER(test_string, concatenation_null_terminated);
+      WASM_TEST_HANDLER(test_string, substring_out_of_bound);
       WASM_TEST_HANDLER(test_string, concatenation_non_null_terminated);
       WASM_TEST_HANDLER(test_string, assign);
       WASM_TEST_HANDLER(test_string, comparison_operator);
