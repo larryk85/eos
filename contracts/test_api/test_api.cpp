@@ -15,7 +15,7 @@
 #include "test_crypto.cpp"
 #include "test_chain.cpp"
 #include "test_real.cpp"
-//#include "test_transaction.cpp"
+#include "test_transaction.cpp"
 
 extern "C" {
 
@@ -38,7 +38,9 @@ extern "C" {
       WASM_TEST_HANDLER(test_compiler_builtins, test_divti3);
       WASM_TEST_HANDLER(test_compiler_builtins, test_divti3_by_0);
       WASM_TEST_HANDLER(test_compiler_builtins, test_lshlti3);
-      //WASM_TEST_HANDLER(test_compiler_builtins, test_lshrti3);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_lshrti3);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_ashlti3);
+      WASM_TEST_HANDLER(test_compiler_builtins, test_ashrti3);
 
       //test_action
       WASM_TEST_HANDLER(test_action, read_action_normal);
@@ -70,14 +72,14 @@ extern "C" {
       WASM_TEST_HANDLER(test_crypto, asert_sha256_true);
       WASM_TEST_HANDLER(test_crypto, asert_no_data);
 
-#if 0
       //test transaction
-      WASM_TEST_HANDLER(test_transaction, send_message);
-      WASM_TEST_HANDLER(test_transaction, send_message_empty);
-      WASM_TEST_HANDLER(test_transaction, send_message_max);
-      WASM_TEST_HANDLER(test_transaction, send_message_large);
-      WASM_TEST_HANDLER(test_transaction, send_message_recurse);
-      WASM_TEST_HANDLER(test_transaction, send_message_inline_fail);
+      WASM_TEST_HANDLER(test_transaction, send_action);
+      WASM_TEST_HANDLER(test_transaction, send_action_empty);
+      WASM_TEST_HANDLER(test_transaction, send_action_max);
+      WASM_TEST_HANDLER(test_transaction, send_action_large);
+      WASM_TEST_HANDLER(test_transaction, send_action_recurse);
+      WASM_TEST_HANDLER(test_transaction, send_action_inline_fail);
+#if 0
       WASM_TEST_HANDLER(test_transaction, send_transaction);
       WASM_TEST_HANDLER(test_transaction, send_transaction_empty);
       WASM_TEST_HANDLER(test_transaction, send_transaction_max);
