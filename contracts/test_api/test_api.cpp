@@ -61,6 +61,8 @@ extern "C" {
       //test_math
       WASM_TEST_HANDLER(test_math, test_multeq);
       WASM_TEST_HANDLER(test_math, test_diveq);
+      WASM_TEST_HANDLER(test_math, test_i64_to_double);
+      WASM_TEST_HANDLER(test_math, test_double_to_i64);
       WASM_TEST_HANDLER(test_math, test_diveq_by_0);
       WASM_TEST_HANDLER(test_math, test_double_api);
       WASM_TEST_HANDLER(test_math, test_double_api_div_0);
@@ -68,22 +70,21 @@ extern "C" {
       //test crypto
       WASM_TEST_HANDLER(test_crypto, test_sha256);
       WASM_TEST_HANDLER(test_crypto, sha256_no_data);
-      WASM_TEST_HANDLER(test_crypto, asert_sha256_false);
-      WASM_TEST_HANDLER(test_crypto, asert_sha256_true);
-      WASM_TEST_HANDLER(test_crypto, asert_no_data);
+      WASM_TEST_HANDLER(test_crypto, sha256_null);
+      WASM_TEST_HANDLER(test_crypto, assert_sha256_false);
+      WASM_TEST_HANDLER(test_crypto, assert_sha256_true);
 
       //test transaction
       WASM_TEST_HANDLER(test_transaction, send_action);
       WASM_TEST_HANDLER(test_transaction, send_action_empty);
-      WASM_TEST_HANDLER(test_transaction, send_action_max);
       WASM_TEST_HANDLER(test_transaction, send_action_large);
       WASM_TEST_HANDLER(test_transaction, send_action_recurse);
       WASM_TEST_HANDLER(test_transaction, send_action_inline_fail);
-#if 0
       WASM_TEST_HANDLER(test_transaction, send_transaction);
       WASM_TEST_HANDLER(test_transaction, send_transaction_empty);
-      WASM_TEST_HANDLER(test_transaction, send_transaction_max);
       WASM_TEST_HANDLER(test_transaction, send_transaction_large);
+#if 0
+      WASM_TEST_HANDLER(test_transaction, send_transaction_max);
 #endif
 
       //test chain
@@ -95,12 +96,14 @@ extern "C" {
       WASM_TEST_HANDLER(test_fixedpoint, test_subtraction);
       WASM_TEST_HANDLER(test_fixedpoint, test_multiplication);
       WASM_TEST_HANDLER(test_fixedpoint, test_division);
+      WASM_TEST_HANDLER(test_fixedpoint, test_division_by_0);
 
       // test double
       WASM_TEST_HANDLER(test_real, create_instances);
       WASM_TEST_HANDLER(test_real, test_addition);
       WASM_TEST_HANDLER(test_real, test_multiplication);
       WASM_TEST_HANDLER(test_real, test_division);
+      WASM_TEST_HANDLER(test_real, test_division_by_0);
 
 #if 1
       // test account
