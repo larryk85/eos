@@ -305,3 +305,25 @@ static const char table_checker_small_wast[] = R"=====(
  (elem (i32.const 0) $apple)
 )
 )=====";
+
+static const char call_indirect_wast[] = R"=====(
+(module
+ (import "env" "eosio_assert" (func $assert (param i32 i32)))
+ (import "env" "printi" (func $printi (param i64)))
+ (import "env" "prints" (func $prints (param i64)))
+ (type $SIG$vj (func (param i64)))
+ (table 128 anyfunc)
+ (memory $0 1)
+ (data k
+ (export "foo" (func $foo))
+ (export "bar" (func $bar))
+ (export "baz" (func $baz))
+ (export "apply" (func $apply))
+ (func $foo (param $0 i64) 
+   (call prints)
+ (func $bar (param $0 i64))
+ (func $baz (param $0 i64))
+)
+)=====";
+
+

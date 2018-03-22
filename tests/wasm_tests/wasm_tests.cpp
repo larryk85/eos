@@ -327,7 +327,6 @@ BOOST_FIXTURE_TEST_CASE( f64_tests, tester ) try {
    }
 } FC_LOG_AND_RETHROW()
 
-#if 0
 // test softfloat conversion operations
 BOOST_FIXTURE_TEST_CASE( f32_f64_conversion_tests, tester ) try {
    produce_blocks(2);
@@ -352,8 +351,27 @@ BOOST_FIXTURE_TEST_CASE( f32_f64_conversion_tests, tester ) try {
       BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
       const auto& receipt = get_transaction_receipt(trx.id());
    }
+   produce_block();
+   {
+      set_code(N(f_tests), f32_trunc_i32s_of1_wast);
+      produce_blocks(10);
+
+      signed_transaction trx;
+      action act;
+      act.account = N(f_tests);
+      act.name = N();
+      act.authorization = vector<permission_level>{{N(f_tests),config::active_name}};
+      trx.actions.push_back(act);
+
+      set_tapos(trx);
+      trx.sign(get_private_key( N(f_tests), "active" ), chain_id_type());
+      push_transaction(trx);
+      produce_blocks(1);
+      BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
+      const auto& receipt = get_transaction_receipt(trx.id());
+   }
+
 } FC_LOG_AND_RETHROW()
-#endif
 
 /**
  * Make sure WASM "start" method is used correctly

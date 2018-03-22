@@ -22,6 +22,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
       static std::map<std::string, uint32_t>           registered_injected;
       static std::map<uint32_t, uint32_t>              injected_index_mapping;
       static uint32_t                                  first_imported_index;
+      static uint32_t                                  next_injected_index;
 
       static void init( Module& mod ) { 
          type_slots.clear(); 
@@ -29,6 +30,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
          injected_index_mapping.clear();
          first_imported_index = mod.functions.imports.size();
          build_type_slots( mod );
+         next_injected_index = 0;
       }
 
       static void build_type_slots( Module& mod ) {
@@ -49,32 +51,15 @@ namespace eosio { namespace chain { namespace wasm_injections {
          }
       }
 
-      static int last_imported_index( Module& module ) {
-         return module.functions.imports.size() - 1;
-      }
-
-      // get the next available index that is greater than the last exported function
-      static int get_next_index( Module& module ) {
-         int exports = 0;
-         for ( auto exp : module.exports )
-            if ( exp.kind == IR::ObjectKind::function )
-               exports++;
-
-         uint32_t next_index = module.functions.imports.size() + module.functions.defs.size() + exports + registered_injected.size()-1;
-         return next_index;
-      }
-
       template <ResultType Result, ValueType... Params>
       static void add_import(Module& module, const char* scope, const char* func_name, int32_t& index ) {
          if (module.functions.imports.size() == 0 || registered_injected.find(func_name) == registered_injected.end() ) {
             add_type_slot<Result, Params...>( module );
             const uint32_t func_type_index = type_slots[{ FromResultType<Result>::value, FromValueType<Params>::value... }];
-            uint32_t next_index = get_next_index( module );
-            registered_injected.emplace( func_name, next_index );
-            module.functions.imports.push_back({{func_type_index}, std::move(scope), std::move(func_name)});
-            // TODO this is a work around to fix the export or nonimported call index offsetting
-            injected_index_mapping.emplace( next_index, module.functions.imports.size()-1 );
-            index = next_index;
+            index = registered_injected.size();
+            registered_injected.emplace( func_name, index );
+            decltype(module.functions.imports) new_import = { {{func_type_index}, std::move(scope), std::move(func_name)} };
+            module.functions.imports.insert( module.functions.imports.begin(), new_import.begin(), new_import.end() ); // prepend to the head of the imports
             // shift all exported functions by 1
             for ( int i=0; i < module.exports.size(); i++ ) {
                if ( module.exports[i].kind == IR::ObjectKind::function )
@@ -180,14 +165,9 @@ namespace eosio { namespace chain { namespace wasm_injections {
       static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
          wasm_ops::op_types<>::call_t* call_inst = reinterpret_cast<wasm_ops::op_types<>::call_t*>(inst);
          const int offset = injector_utils::registered_injected.size();
-         uint32_t mapped_index = injector_utils::injected_index_mapping[call_inst->field];
-         if ( mapped_index > 0 ) {
-            call_inst->field = mapped_index;
-         } 
-         else
-            if ( call_inst->field > injector_utils::first_imported_index - 1 ) {
-               call_inst->field += offset;
-            }
+         std::cout << "OFF " << offset << "\n";
+         if ( call_inst->field > offset-1 )
+            call_inst->field += offset;
       }
 
    };
