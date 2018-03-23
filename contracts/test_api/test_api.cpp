@@ -22,7 +22,6 @@ extern "C" {
     void init()  {
 
     }
-
    void apply( unsigned long long, unsigned long long action ) {
       //eosio::print("==> CONTRACT: ", code, " ", action, "\n");
       //test_types
