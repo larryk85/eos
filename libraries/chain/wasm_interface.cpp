@@ -186,7 +186,7 @@ namespace eosio { namespace chain {
                   Serialization::ArrayOutputStream outstream;
                   WASM::serialize(outstream, *module);
                   std::vector<U8> bytes = outstream.getBytes();
-
+                  
                   wavm = wavm::entry::build((char*)bytes.data(), bytes.size());
                   wavm_info.emplace(*wavm);
 
@@ -856,6 +856,7 @@ class softfloat_api : public context_aware_api {
          return from_softfloat32(f64_to_f32( to_softfloat64(a)) ); 
       }
       int32_t _eosio_f32_trunc_i32s( float af ) { 
+         std::cout << "A " << af << "\n";
          float32_t a = to_softfloat32(af);
          if (a.v == 0x4F000000 || a.v == 0xCF000001 || a.v == 0x7F800000 || a.v == 0xFF800000)
             FC_THROW_EXCEPTION( eosio::chain::wasm_execution_error, "Error, f32.convert_s/i32 overflow");
@@ -872,7 +873,6 @@ class softfloat_api : public context_aware_api {
          return f64_to_i32( to_softfloat64(_eosio_f64_trunc( af )), 0, false ); 
       }
       uint32_t _eosio_f32_trunc_i32u( float af ) { 
-         std::cout << "A " << af << "\n";
          float32_t a = to_softfloat32(af);
          if (a.v == 0x4F800000 || a.v == 0xBF800000 || a.v == 0x7F800000 || a.v == 0xFF800000)
             FC_THROW_EXCEPTION( eosio::chain::wasm_execution_error, "Error, f32.convert_u/i32 overflow");
