@@ -1,9 +1,13 @@
 find_package(Wasm)
 
+# variable to set optimization level for WASM clang and opt
+set( WASM_OPT_LEVEL "O3")
+
 if(WASM_FOUND)
   message(STATUS "Using WASM clang => " ${WASM_CLANG})
   message(STATUS "Using WASM llc => " ${WASM_LLC})
   message(STATUS "Using WASM llvm-link => " ${WASM_LLVM_LINK})
+  message(STATUS "Using WASM opt => " ${WASM_LLVM_OPT})
 else()
   message( FATAL_ERROR "No WASM compiler cound be found (make sure WASM_ROOT is set)" )
   return()
@@ -53,7 +57,7 @@ macro(compile_wast)
       set(STDFLAG "--std=c++14")
     endif()
 
-    set(WASM_COMMAND ${WASM_CLANG} -emit-llvm -O3 ${STDFLAG} --target=wasm32 -ffreestanding
+    set(WASM_COMMAND ${WASM_CLANG} -emit-llvm -O3 ${STDFLAG} --target=wasm32 -ffunction-sections -ffreestanding
               -nostdlib -nostdlibinc -fno-threadsafe-statics -fno-rtti -fno-exceptions  
               -c ${infile} -o ${outfile}.bc
     )
@@ -129,6 +133,7 @@ macro(add_wast_executable)
   add_custom_command(OUTPUT ${target}.bc
     DEPENDS ${outfiles} ${ARG_LIBRARIES} ${LIBRARIES}
     COMMAND ${WASM_LLVM_LINK} -only-needed -o ${target}.bc ${outfiles} ${LIBRARIES}
+    #COMMAND ${WASM_LLVM_OPT} -globalopt -strip-dead-prototypes -strip -deadargelim -globaldce -std-link-opts -${WASM_OPT_LEVEL} -load=/Users/judgefudge/wasm_pass/obj/libWasmUnusedFunctionRemoval.so -wasm_ufr ${target}.bc -o ${target}.bc
     COMMENT "Linking LLVM bitcode executable ${target}.bc"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     VERBATIM

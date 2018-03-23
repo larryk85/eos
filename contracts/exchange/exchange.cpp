@@ -240,7 +240,6 @@ namespace eosio {
 } /// namespace eosio
 
 
-
 extern "C" {
    void apply( uint64_t code, uint64_t action ) {
       eosio::exchange  ex( current_receiver() );
@@ -249,5 +248,3 @@ extern "C" {
    }
 }
 
-void main() {
-}

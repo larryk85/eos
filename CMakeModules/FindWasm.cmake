@@ -13,6 +13,7 @@ endif()
 find_program(WASM_CLANG clang PATHS ${WASM_ROOT}/bin NO_DEFAULT_PATH)
 find_program(WASM_LLC llc PATHS ${WASM_ROOT}/bin NO_DEFAULT_PATH)
 find_program(WASM_LLVM_LINK llvm-link PATHS ${WASM_ROOT}/bin NO_DEFAULT_PATH)
+find_program(WASM_LLVM_OPT opt PATHS ${WASM_ROOT}/bin NO_DEFAULT_PATH)
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set EOS_FOUND to TRUE

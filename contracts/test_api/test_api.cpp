@@ -23,6 +23,7 @@ extern "C" {
 
     }
 
+//   int main( unsigned long long, unsigned long long action ) {
    void apply( unsigned long long, unsigned long long action ) {
       //eosio::print("==> CONTRACT: ", code, " ", action, "\n");
       //test_types
@@ -155,7 +156,7 @@ extern "C" {
 */
 
       //unhandled test call
-      eosio_assert(false, "Unknown Test");
-
+      //eosio_assert(false, "Unknown Test");
+      //return -1;
    }
 }

@@ -21,6 +21,13 @@ static constexpr u64 WASM_TEST_ACTION(const char* cls, const char* method)
   return u64(DJBH(cls)) << 32 | u64(DJBH(method));
 }
 
+#define WASM_TEST_HANDLER_MAIN(CLASS, METHOD) \
+  if( action == WASM_TEST_ACTION(#CLASS, #METHOD) ) { \
+     CLASS::METHOD(); \
+     return 0; \
+  }
+
+
 #define WASM_TEST_HANDLER(CLASS, METHOD) \
   if( action == WASM_TEST_ACTION(#CLASS, #METHOD) ) { \
      CLASS::METHOD(); \
