@@ -185,11 +185,8 @@ namespace eosio { namespace chain {
                   validator.validate();
                   Serialization::ArrayOutputStream outstream;
                   WASM::serialize(outstream, *module);
-                  static int ii = 0;
                   std::vector<U8> bytes = outstream.getBytes();
-                  std::ofstream of(std::string("edump")+std::to_string(ii++), std::ios::out|std::ios::binary);
-                  of.write((char*)bytes.data(), bytes.size());
-                  of.close();
+
                   wavm = wavm::entry::build((char*)bytes.data(), bytes.size());
                   wavm_info.emplace(*wavm);
 

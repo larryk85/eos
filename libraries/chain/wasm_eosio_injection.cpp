@@ -13,7 +13,6 @@ using namespace IR;
 std::map<std::vector<uint16_t>, uint32_t> injector_utils::type_slots;
 std::map<std::string, uint32_t>           injector_utils::registered_injected;
 std::map<uint32_t, uint32_t>              injector_utils::injected_index_mapping;
-uint32_t                                  injector_utils::first_imported_index = 0;
 uint32_t                                  injector_utils::next_injected_index = 0;
 
 
