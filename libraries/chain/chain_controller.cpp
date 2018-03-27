@@ -1478,9 +1478,13 @@ transaction_trace chain_controller::__apply_transaction( transaction_metadata& m
    transaction_trace result(meta.id);
 
    validate_transaction( meta.trx() );
+   EOS_ASSERT( !meta.trx().actions.empty(), tx_no_action, "transactions require at least one context-sensitive action" );
+   // first check for at least one valid action
+   for (const auto& act : meta.trx().actions)
+      EOS_ASSERT( !act.authorization.empty(), action_missing_auth, "context-sensitive actions require at least one authorization" );
 
    for (const auto &act : meta.trx().context_free_actions) {
-      FC_ASSERT( act.authorization.size() == 0, "context free actions cannot require authorization" );
+      EOS_ASSERT( act.authorization.empty(), cfa_irrelevant_auth, "context-free actions cannot require authorization" );
       apply_context context(*this, _db, act, meta);
       context.context_free = true;
       context.exec();
@@ -1494,10 +1498,12 @@ transaction_trace chain_controller::__apply_transaction( transaction_metadata& m
       context.exec();
       context.used_context_free_api |= act.authorization.size();
 
-      FC_ASSERT( context.used_context_free_api, "action did not reference database state, it should be moved to context_free_actions", ("act",act) );
       fc::move_append(result.action_traces, std::move(context.results.applied_actions));
       fc::move_append(result.deferred_transactions, std::move(context.results.generated_transactions));
       fc::move_append(result.canceled_deferred, std::move(context.results.canceled_deferred));
+      // check if all authorizations were used
+      if (!(act.name == N(updateauth)))
+         EOS_ASSERT( context.all_authorizations_used(), tx_irrelevant_auth, "actions should only require the authorizations needed for execution" );
    }
 
    uint32_t act_usage = result.action_traces.size();
