@@ -67,12 +67,13 @@ struct struct_def {
 
 struct action_def {
    action_def() = default;
-   action_def(const action_name& name, const type_name& type)
-   :name(name), type(type)
+   action_def(const action_name& name, const type_name& type, const string& ricardian_contract)
+   :name(name), type(type), ricardian_contract(ricardian_contract)
    {}
 
    action_name name;
-   type_name type;
+   type_name   type;
+   string      ricardian_contract; 
 };
 
 struct table_def {
@@ -90,7 +91,7 @@ struct table_def {
 
 struct abi_def {
    abi_def() = default;
-   abi_def(const vector<type_def>& types, const vector<struct_def>& structs, const vector<action_def>& actions, const vector<table_def>& tables)
+   abi_def(const vector<type_def>& types, const vector<struct_def>& structs, const vector<action_def>& actions, const vector<table_def>& tables, const vector<string>& clauses)
    :types(types), structs(structs), actions(actions), tables(tables)
    {}
 
@@ -98,6 +99,7 @@ struct abi_def {
    vector<struct_def>   structs;
    vector<action_def>   actions;
    vector<table_def>    tables;
+   map<string, string>  clauses;
 };
 
 struct newaccount {
