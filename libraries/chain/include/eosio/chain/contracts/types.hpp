@@ -91,8 +91,8 @@ struct table_def {
 
 struct abi_def {
    abi_def() = default;
-   abi_def(const vector<type_def>& types, const vector<struct_def>& structs, const vector<action_def>& actions, const vector<table_def>& tables, const vector<string>& clauses)
-   :types(types), structs(structs), actions(actions), tables(tables)
+   abi_def(const vector<type_def>& types, const vector<struct_def>& structs, const vector<action_def>& actions, const vector<table_def>& tables, const map<string, string>& clauses)
+   :types(types), structs(structs), actions(actions), tables(tables), clauses(clauses)
    {}
 
    vector<type_def>     types;
@@ -300,9 +300,9 @@ struct mindelay {
 FC_REFLECT( eosio::chain::contracts::type_def                         , (new_type_name)(type) )
 FC_REFLECT( eosio::chain::contracts::field_def                        , (name)(type) )
 FC_REFLECT( eosio::chain::contracts::struct_def                       , (name)(base)(fields) )
-FC_REFLECT( eosio::chain::contracts::action_def                       , (name)(type) )
+FC_REFLECT( eosio::chain::contracts::action_def                       , (name)(type)(ricardian_contract) )
 FC_REFLECT( eosio::chain::contracts::table_def                        , (name)(index_type)(key_names)(key_types)(type) )
-FC_REFLECT( eosio::chain::contracts::abi_def                          , (types)(structs)(actions)(tables) )
+FC_REFLECT( eosio::chain::contracts::abi_def                          , (types)(structs)(actions)(tables)(clauses) )
 
 FC_REFLECT( eosio::chain::contracts::newaccount                       , (creator)(name)(owner)(active)(recovery) )
 FC_REFLECT( eosio::chain::contracts::setcode                          , (account)(vmtype)(vmversion)(code) ) //abi

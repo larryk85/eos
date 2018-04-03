@@ -186,7 +186,8 @@
   ],
   "actions": [{
       "name": "transfer",
-      "type": "transfer"
+      "type": "transfer",
+      "ricardian_contract": "",
     },{
       "name": "issue",
       "type": "issue"
