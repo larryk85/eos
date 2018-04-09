@@ -593,7 +593,7 @@ BOOST_FIXTURE_TEST_CASE(compiler_builtins_tests, TESTER) { try {
 	produce_blocks(1000);
 	set_code( N(testapi), test_api_wast );
 	produce_blocks(1);
-
+   
    // test test_multi3
    CALL_TEST_FUNCTION( *this, "test_compiler_builtins", "test_multi3", {});
 

@@ -106,7 +106,7 @@ namespace eosio { namespace testing {
          void delete_authority( account_name account, permission_name perm );
 
          void create_account( account_name name, account_name creator = config::system_account_name, bool multisig = false );
-
+         bool is_same_chain( base_tester& other );
          transaction_trace push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
          transaction_trace push_reqauth(account_name from, string role, bool multi_sig = false);
          // use when just want any old non-context free action

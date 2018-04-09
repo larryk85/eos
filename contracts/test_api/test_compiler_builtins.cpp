@@ -327,6 +327,15 @@ void test_compiler_builtins::test_modti3() {
    __int128 rhs_a  = 100;
    __int128 lhs_b  = 30;
    __int128 rhs_b  = -100;
+   //TODO CHECK ALIGNMENT
+   __int128 ma_res[2];
+   //static inline _Bool is_aligned(const void *restrict pointer, size_t byte_count)
+   //{ return (uintptr_t)pointer % byte_count == 0; }
+   uintptr_t ma_ptr = (uintptr_t)(ma_res);
+   for (int i=0; i < 100; i++) {
+      if (ma_ptr+i % 16 == 1)
+         break;
+   }
    
    __modti3( res, uint64_t(lhs_a), uint64_t(lhs_a >> 64), uint64_t(rhs_a), uint64_t(rhs_a >> 64) );
    eosio_assert( res ==  -30, "__modti3 result should be -30" );

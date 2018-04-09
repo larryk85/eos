@@ -29,6 +29,18 @@ namespace eosio { namespace testing {
       return res;
    }
 
+   bool base_tester::is_same_chain( base_tester& other ) {
+     auto hbh = control->head_block_header();
+     auto vn_hbh = other.control->head_block_header();
+     return control->head_block_id() == other.control->head_block_id() &&
+            hbh.previous == vn_hbh.previous &&
+            hbh.timestamp == vn_hbh.timestamp &&
+            hbh.transaction_mroot == vn_hbh.transaction_mroot &&
+            hbh.action_mroot == vn_hbh.action_mroot &&
+            hbh.block_mroot == vn_hbh.block_mroot &&
+            hbh.producer == vn_hbh.producer;
+   }
+
    void base_tester::init(bool push_genesis, chain_controller::runtime_limits limits) {
       cfg.block_log_dir      = tempdir.path() / "blocklog";
       cfg.shared_memory_dir  = tempdir.path() / "shared";
@@ -579,11 +591,20 @@ namespace eosio { namespace testing {
          return other.sync_with(*this);
 
       auto sync_dbs = [](base_tester& a, base_tester& b) {
-         for (int i = 1; i <= a.control->head_block_num(); ++i) {
+         for (int i = 1; i <= a.control->head_block_num() - 10; ++i) {
             auto block = a.control->fetch_block_by_number(i);
             if (block && !b.control->is_known_block(block->id())) {
                b.control->push_block(*block, eosio::chain::validation_steps::created_block);
             }
+         }
+         for ( int i=0; i < 10; i++ )
+            a.produce_block();
+         for (int i = a.control->head_block_num()-10; i <= a.control->head_block_num(); ++i) {
+            auto block = a.control->fetch_block_by_number(i);
+            if (block && !b.control->is_known_block(block->id())) {
+               b.control->push_block(*block, eosio::chain::validation_steps::created_block);
+            }
+
          }
       };
 
