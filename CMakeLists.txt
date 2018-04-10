@@ -33,6 +33,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         message(FATAL_ERROR "GCC version must be at least 4.8!")
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    message(STATUS "CLANG ${CMAKE_CXX_COMPILER_ID}")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3)
         message(FATAL_ERROR "Clang version must be at least 3.3!")
     endif()
@@ -136,7 +137,7 @@ else( WIN32 ) # Apple AND Linux
 
     if( APPLE )
         # Apple Specific Options Here
-        message( STATUS "Configuring Eos on OS X" )
+        message( STATUS "Configuring Eos on OS X -fsanitize=undefined " )
         set( CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-deprecated-declarations" )
     else( APPLE )
         # Linux Specific Options Here

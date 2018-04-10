@@ -2,6 +2,9 @@
 #include <eosio/testing/tester_network.hpp>
 #include <eosio/chain/producer_object.hpp>
 
+#include <currency/currency.wast.hpp>
+#include <currency/currency.abi.hpp>
+
 using namespace eosio;
 using namespace eosio::chain;
 using namespace eosio::chain::contracts;
@@ -15,7 +18,134 @@ using namespace eosio::testing;
 
 BOOST_AUTO_TEST_SUITE(block_tests)
 
+void sync_with_test( base_tester& tester_a, base_tester& tester_b, int offset ) {
+   if (tester_a.control->head_block_id() == tester_b.control->head_block_id())
+      return;
+   if (tester_a.control->head_block_num() < tester_b.control->head_block_num())
+      return tester_b.sync_with(tester_a);
+
+   auto sync_dbs = [&](base_tester& a, base_tester& b) {
+      for (int i = 1; i <= a.control->head_block_num() - offset; ++i) {
+         auto block = a.control->fetch_block_by_number(i);
+         if (block && !b.control->is_known_block(block->id())) {
+            b.control->push_block(*block, eosio::chain::validation_steps::created_block);
+         }
+      }
+      for ( int i=0; i < 10; i++ )
+         a.produce_block();
+      for (int i = a.control->head_block_num() - offset; i <= a.control->head_block_num(); ++i) {
+         auto block = a.control->fetch_block_by_number(i);
+         if (block && !b.control->is_known_block(block->id())) {
+            b.control->push_block(*block, eosio::chain::validation_steps::created_block);
+         }
+
+      }
+   };
+
+   sync_dbs(tester_a, tester_b);
+   sync_dbs(tester_b, tester_a);
+}
+decltype(auto) push_action(base_tester& test, const account_name& signer, const action_name &name, const variant_object &data ) {
+   auto abi_ser = abi_serializer(json::from_string(currency_abi).as<abi_def>());
+   string action_type_name = abi_ser.get_action_type(name);
+
+   action act;
+   act.account = N(currency);
+   act.name = name;
+   act.authorization = vector<permission_level>{{signer, config::active_name}};
+   act.data = abi_ser.variant_to_binary(action_type_name, data);
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::move(act));
+   test.set_transaction_headers(trx);
+   trx.sign(test.get_private_key(signer, "active"), chain_id_type());
+   return test.push_transaction(trx);
+}
+
 BOOST_AUTO_TEST_CASE( sync_test ) { try {
+   constexpr uint8_t NUM_OF_TESTERS = 5;
+   tester testers[NUM_OF_TESTERS];
+   tester_network net;
+   for ( int i=0; i < NUM_OF_TESTERS; i++ )
+      net.connect_blockchain( testers[i] );
+
+   vector<account_name> producer_names;
+   for (char i = 'a'; i <= 'a'+NUM_OF_TESTERS; i++) {
+      producer_names.emplace_back(std::string("init") + i);
+   }
+   testers[0].create_accounts(producer_names);
+   testers[0].set_producers(producer_names);
+   testers[0].create_account(N(currency));
+   testers[0].set_code( N(currency), currency_wast );
+   testers[0].create_account(N(alice));
+   testers[0].create_account(N(bob));
+
+   testers[0].produce_block();
+   {
+         auto result = push_action(testers[0], N(currency), N(create), mutable_variant_object()
+                 ("issuer",       "currency")
+                 ("maximum_supply", "1000000000.0000 CUR")
+                 ("can_freeze", 0)
+                 ("can_recall", 0)
+                 ("can_whitelist", 0)
+         );
+         wdump((result));
+
+         result = push_action(testers[0], N(currency), N(issue), mutable_variant_object()
+                 ("to",       "currency")
+                 ("quantity", "1000000.0000 CUR")
+                 ("memo", "gggggggggggg")
+         );
+
+      testers[0].produce_block();
+      }
+   // Produce blocks until the next block production will use the new set of producers from beginning
+   // First, end the current producer round
+   auto produce_until_end = []( auto& test ) {
+      uint64_t blocks_per_round;
+      while (true) {
+         blocks_per_round = test.control->get_global_properties().active_producers.producers.size() * config::producer_repetitions;
+         test.produce_block();
+         if (test.control->head_block_num() % blocks_per_round == (blocks_per_round - 1) ) break;
+      }
+   };
+   
+   for ( int i = 0; i < NUM_OF_TESTERS*2; i++ ) {
+      testers[i%NUM_OF_TESTERS].produce_blocks_until_end_of_round();
+      auto trace = push_action(testers[i%NUM_OF_TESTERS], N(currency), N(transfer), mutable_variant_object()
+               ("from", "currency")
+               ("to",   "alice")
+               ("quantity", "100.0000 CUR")
+               ("memo", "fund Alice")
+            );
+   }
+
+   net.disconnect_blockchain( testers[3] );
+   BOOST_CHECK(testers[3].control->head_block_num() == testers[1].control->head_block_num());
+   for ( int i = 0; i < NUM_OF_TESTERS*10; i++ ) {
+      auto trace = push_action(testers[i%NUM_OF_TESTERS], N(currency), N(transfer), mutable_variant_object()
+         ("from", "currency")
+         ("to",   "alice")
+         ("quantity", "100.0000 CUR")
+         ("memo", "fund Alice")
+      );
+      testers[i%NUM_OF_TESTERS].produce_blocks_until_end_of_round();
+   }
+   
+   for ( int i = 0; i < 10; i++ )
+      testers[3].produce_block();
+
+   BOOST_CHECK(testers[3].control->head_block_num() < testers[1].control->head_block_num());
+   BOOST_CHECK( !testers[3].is_same_chain(testers[1]) );
+   sync_with_test( testers[3], testers[1], 10 );
+   net.connect_blockchain( testers[3] );
+   BOOST_CHECK( testers[3].is_same_chain(testers[1]) );
+   for ( int i = 0; i < NUM_OF_TESTERS*2; i++ )
+      testers[i%NUM_OF_TESTERS].produce_blocks_until_end_of_round();
+   BOOST_CHECK( testers[3].is_same_chain(testers[1]) );
+} FC_LOG_AND_RETHROW() } // sync_test
+
+BOOST_AUTO_TEST_CASE( sync_old_block_test ) { try {
    constexpr uint8_t NUM_OF_TESTERS = 5;
    tester testers[NUM_OF_TESTERS];
    tester_network net;
@@ -35,6 +165,7 @@ BOOST_AUTO_TEST_CASE( sync_test ) { try {
       uint64_t blocks_per_round;
       while (true) {
          blocks_per_round = test.control->get_global_properties().active_producers.producers.size() * config::producer_repetitions;
+
          test.produce_block();
          if (test.control->head_block_num() % blocks_per_round == (blocks_per_round - 1) ) break;
       }
@@ -47,12 +178,13 @@ BOOST_AUTO_TEST_CASE( sync_test ) { try {
    for ( int i = 0; i < NUM_OF_TESTERS*10; i++ )
       testers[i%NUM_OF_TESTERS].produce_blocks_until_end_of_round();
    
-   for ( int i = 0; i < 10; i++ )
+   for ( int i = 0; i < 100; i++ ) {
       testers[3].produce_block();
+   }
 
    BOOST_CHECK(testers[3].control->head_block_num() < testers[1].control->head_block_num());
    BOOST_CHECK( !testers[3].is_same_chain(testers[1]) );
-   testers[3].sync_with( testers[1] );
+   sync_with_test( testers[3], testers[1], 10 );
    net.connect_blockchain( testers[3] );
    BOOST_CHECK( testers[3].is_same_chain(testers[1]) );
    for ( int i = 0; i < NUM_OF_TESTERS*2; i++ )
@@ -74,7 +206,6 @@ BOOST_AUTO_TEST_CASE( sync_after_closing_test ) { try {
    testers[0].create_accounts(producer_names);
    testers[0].set_producers(producer_names);
 
-      
    for ( int i = 0; i < NUM_OF_TESTERS*2; i++ )
       testers[i%NUM_OF_TESTERS].produce_blocks_until_end_of_round();
    BOOST_CHECK(testers[3].control->head_block_num() == testers[1].control->head_block_num());
@@ -90,7 +221,7 @@ BOOST_AUTO_TEST_CASE( sync_after_closing_test ) { try {
    testers[3].close();
    testers[3].open();
    BOOST_CHECK( !testers[3].is_same_chain(testers[1]) );
-   testers[3].sync_with( testers[1] );
+   sync_with_test( testers[3], testers[1], 10 );
    net.connect_blockchain( testers[3] );
    BOOST_CHECK( testers[3].is_same_chain(testers[1]) );
    for ( int i = 0; i < NUM_OF_TESTERS*2; i++ )

@@ -581,7 +581,6 @@ namespace eosio { namespace testing {
       return s;
    }
 
-
    void base_tester::sync_with(base_tester& other) {
       // Already in sync?
       if (control->head_block_id() == other.control->head_block_id())
@@ -591,20 +590,11 @@ namespace eosio { namespace testing {
          return other.sync_with(*this);
 
       auto sync_dbs = [](base_tester& a, base_tester& b) {
-         for (int i = 1; i <= a.control->head_block_num() - 10; ++i) {
+         for (int i = 1; i <= a.control->head_block_num(); ++i) {
             auto block = a.control->fetch_block_by_number(i);
             if (block && !b.control->is_known_block(block->id())) {
                b.control->push_block(*block, eosio::chain::validation_steps::created_block);
             }
-         }
-         for ( int i=0; i < 10; i++ )
-            a.produce_block();
-         for (int i = a.control->head_block_num()-10; i <= a.control->head_block_num(); ++i) {
-            auto block = a.control->fetch_block_by_number(i);
-            if (block && !b.control->is_known_block(block->id())) {
-               b.control->push_block(*block, eosio::chain::validation_steps::created_block);
-            }
-
          }
       };
 
