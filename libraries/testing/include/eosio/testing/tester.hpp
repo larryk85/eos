@@ -65,6 +65,7 @@ namespace eosio { namespace testing {
          typedef string action_result;
 
          static const uint32_t DEFAULT_EXPIRATION_DELTA = 6;
+         bool              is_same_chain( base_tester& other );
 
          void              init(bool push_genesis = true, chain_controller::runtime_limits limits = chain_controller::runtime_limits());
          void              init(chain_controller::controller_config config);

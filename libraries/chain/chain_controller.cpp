@@ -682,15 +682,16 @@ signed_block chain_controller::_generate_block( block_timestamp_type when,
 
       _finalize_block( *_pending_block_trace, producer_obj );
 
-      _pending_block_session->push();
 
       auto result = move( *_pending_block );
 
-      clear_pending();
 
       if (!(skip&skip_fork_db)) {
          _fork_db.push_block(result);
       }
+      _pending_block_session->push();
+      clear_pending();
+
       return result;
    } catch ( ... ) {
       clear_pending();
