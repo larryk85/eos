@@ -1424,6 +1424,7 @@ REGISTER_INTRINSICS(math_api,
    (i64_to_double, int64_t(int64_t)          )
 );
 
+/*
 REGISTER_INTRINSICS(compiler_builtins,
    (__ashlti3,     void(int, int64_t, int64_t, int)               )
    (__ashrti3,     void(int, int64_t, int64_t, int)               )
@@ -1457,6 +1458,7 @@ REGISTER_INTRINSICS(compiler_builtins,
    (__trunctfdf2,  int64_t(int64_t, int64_t)                      )
    (__trunctfsf2,  int(int64_t, int64_t)                          )
 );
+*/
 
 REGISTER_INTRINSICS(privileged_api,
    (is_feature_active,                int(int64_t)                          )
