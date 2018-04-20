@@ -575,6 +575,7 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
    BOOST_REQUIRE_EQUAL( t.validate(), true );
 } FC_LOG_AND_RETHROW() }
 
+#if 0
 /*************************************************************************************
  * compiler_builtins_tests test case
  *************************************************************************************/
@@ -632,6 +633,7 @@ BOOST_FIXTURE_TEST_CASE(compiler_builtins_tests, TESTER) { try {
 
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
+#endif
 
 
 /*************************************************************************************

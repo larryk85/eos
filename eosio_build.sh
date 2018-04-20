@@ -135,6 +135,7 @@
 		export BOOST_ROOT=${HOME}/opt/boost_1_66_0
 		export OPENSSL_ROOT_DIR=/usr/include/openssl
 		export WASM_ROOT=${HOME}/opt/wasm
+		#export WASM_ROOT=${HOME}/Downloads/clang_6/bin
 	fi
 
 	if [ $ARCH == "Darwin" ]; then
@@ -143,7 +144,8 @@
 		C_COMPILER=clang
 		MONGOD_CONF=/usr/local/etc/mongod.conf
 		OPENSSL_ROOT_DIR=/usr/local/opt/openssl
-		export WASM_ROOT=/usr/local/wasm
+		#export WASM_ROOT=/usr/local/wasm
+		export WASM_ROOT=/home/judgefudge/Downloads/clang_6/llvm/bin
 	fi
 
 	. $FILE

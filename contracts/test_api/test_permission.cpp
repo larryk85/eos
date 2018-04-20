@@ -7,7 +7,6 @@
 
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/print.hpp>
-#include <eosiolib/compiler_builtins.h>
 #include <eosiolib/serialize.hpp>
 #include <eosiolib/action.hpp>
 

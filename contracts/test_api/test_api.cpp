@@ -11,7 +11,6 @@
 #include "test_types.cpp"
 #include "test_fixedpoint.cpp"
 #include "test_math.cpp"
-#include "test_compiler_builtins.cpp"
 #include "test_real.cpp"
 #include "test_crypto.cpp"
 #include "test_chain.cpp"
@@ -52,6 +51,7 @@ extern "C" {
       WASM_TEST_HANDLER(test_types, name_class);
 
       //test_compiler_builtins
+      /*
       WASM_TEST_HANDLER(test_compiler_builtins, test_multi3);
       WASM_TEST_HANDLER(test_compiler_builtins, test_divti3);
       WASM_TEST_HANDLER(test_compiler_builtins, test_divti3_by_0);
@@ -65,7 +65,7 @@ extern "C" {
       WASM_TEST_HANDLER(test_compiler_builtins, test_lshrti3);
       WASM_TEST_HANDLER(test_compiler_builtins, test_ashlti3);
       WASM_TEST_HANDLER(test_compiler_builtins, test_ashrti3);
-
+      */
       //test_action
       WASM_TEST_HANDLER(test_action, read_action_normal);
       WASM_TEST_HANDLER(test_action, read_action_to_0);

@@ -1,5 +1,5 @@
 add_wast_executable(TARGET infinite
   INCLUDE_FOLDERS "${STANDARD_INCLUDE_FOLDERS}"
-  LIBRARIES libc++ libc eosiolib
+  LIBRARIES libc++ libc eosiolib rt
   DESTINATION_FOLDER ${CMAKE_CURRENT_BINARY_DIR}
 )

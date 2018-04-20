@@ -20,14 +20,13 @@
 
 /* Precondition:  0 <= b < bits_in_tword */
 
-COMPILER_RT_ABI void
-__ashlti3( ti_int& ret, di_int low, di_int high, si_int b)
+COMPILER_RT_ABI ti_int
+__ashlti3(ti_int a, si_int b)
 {
     const int bits_in_dword = (int)(sizeof(di_int) * CHAR_BIT);
     twords input;
     twords result;
-    input.low = low;
-    input.high = high;
+    input.all = a;
     if (b & bits_in_dword)  /* bits_in_dword <= b < bits_in_tword */
     {
         result.s.low = 0;
@@ -40,7 +39,7 @@ __ashlti3( ti_int& ret, di_int low, di_int high, si_int b)
         result.s.low  = input.s.low << b;
         result.s.high = (input.s.high << b) | (input.s.low >> (bits_in_dword - b));
     }
-    ret = result.all;
+    return result.all;
 }
 
 #endif /* CRT_HAS_128BIT */

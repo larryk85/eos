@@ -96,6 +96,94 @@ macro(compile_wast)
 
 endmacro(compile_wast)
 
+macro(compile_wast_exec)
+  #read arguments include ones that we don't since arguments get forwared "as is" and we don't want to threat unknown argument names as values
+  cmake_parse_arguments(ARG "NOWARNINGS" "TARGET;DESTINATION_FOLDER" "SOURCE_FILES;INCLUDE_FOLDERS;SYSTEM_INCLUDE_FOLDERS;LIBRARIES" ${ARGN})
+  set(target ${ARG_TARGET})
+
+  # NOTE: Setting SOURCE_FILE and looping over it to avoid cmake issue with compilation ${target}.bc's rule colliding with
+  # linking ${target}.bc's rule
+  if ("${ARG_SOURCE_FILES}" STREQUAL "")
+    set(SOURCE_FILES ${target}.cpp)
+  else()
+    set(SOURCE_FILES ${ARG_SOURCE_FILES})
+  endif()
+  set(outfiles "")
+  foreach(srcfile ${SOURCE_FILES})
+    
+    get_filename_component(outfile ${srcfile} NAME)
+    get_filename_component(extension ${srcfile} EXT)
+    get_filename_component(infile ${srcfile} ABSOLUTE)
+
+    # -ffreestanding
+    #   Assert that compilation targets a freestanding environment.
+    #   This implies -fno-builtin. A freestanding environment is one in which the standard library may not exist, and program startup may not necessarily be at main.
+    #   The most obvious example is an OS kernel.
+
+    # -nostdlib
+    #   Do not use the standard system startup files or libraries when linking.
+    #   No startup files and only the libraries you specify are passed to the linker, and options specifying linkage of the system libraries, such as -static-libgcc or -shared-libgcc, are ignored.
+    #   The compiler may generate calls to memcmp, memset, memcpy and memmove.
+    #   These entries are usually resolved by entries in libc. These entry points should be supplied through some other mechanism when this option is specified.
+
+    # -fno-threadsafe-statics
+    #   Do not emit the extra code to use the routines specified in the C++ ABI for thread-safe initialization of local statics.
+    #   You can use this option to reduce code size slightly in code that doesn’t need to be thread-safe.
+
+    # -fno-rtti
+    #   Disable generation of information about every class with virtual functions for use by the C++ run-time type identification features (dynamic_cast and typeid).
+
+    # -fno-exceptions
+    #   Disable the generation of extra code needed to propagate exceptions
+    if ("${extension}" STREQUAL ".c")
+      set(STDFLAG -D_XOPEN_SOURCE=700)
+    else()
+      set(STDFLAG "--std=c++14")
+    endif()
+
+    set(WASM_COMMAND ${WASM_CLANG} -S -O3 ${STDFLAG} --target=wasm32
+              -nostdlib -nostdlibinc -fno-threadsafe-statics -fno-rtti -fno-exceptions  
+              -c ${infile} -o ${target}.s -Xlinker -thread-model=single -asm-verbose=false ${rt}
+    )
+    if (${ARG_NOWARNINGS})
+      list(APPEND WASM_COMMAND -Wno-everything)
+    else()
+      list(APPEND WASM_COMMAND -Weverything -Wno-c++98-compat -Wno-old-style-cast -Wno-vla -Wno-vla-extension -Wno-c++98-compat-pedantic
+                  -Wno-missing-prototypes -Wno-missing-variable-declarations -Wno-packed -Wno-padded -Wno-c99-extensions  -Wno-documentation-unknown-command)
+    endif()
+
+    foreach(folder ${ARG_INCLUDE_FOLDERS})
+       list(APPEND WASM_COMMAND -I ${folder})
+    endforeach()
+
+    if ("${ARG_SYSTEM_INCLUDE_FOLDERS}" STREQUAL "")
+       set (ARG_SYSTEM_INCLUDE_FOLDERS ${DEFAULT_SYSTEM_INCLUDE_FOLDERS})
+    endif()
+    foreach(folder ${ARG_SYSTEM_INCLUDE_FOLDERS})
+       list(APPEND WASM_COMMAND -isystem ${folder})
+    endforeach()
+
+    foreach(folder ${ARG_SYSTEM_INCLUDE_FOLDERS})
+       list(APPEND WASM_COMMAND -isystem ${folder})
+    endforeach()
+
+    add_custom_command(OUTPUT ${target}.s
+      DEPENDS ${infile}
+      COMMAND ${WASM_COMMAND}
+      IMPLICIT_DEPENDS CXX ${infile}
+      COMMENT "Building LLVM bitcode ${outfile}.s"
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      VERBATIM
+    )
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${outfile}.s)
+    list(APPEND outfiles ${outfile}.s)
+
+  endforeach(srcfile)
+
+  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${target}.s)
+
+endmacro(compile_wast_exec)
+
 macro(add_wast_library)
   cmake_parse_arguments(ARG "NOWARNINGS" "TARGET;DESTINATION_FOLDER" "SOURCE_FILES;INCLUDE_FOLDERS;SYSTEM_INCLUDE_FOLDERS" ${ARGN})
   set(target ${ARG_TARGET})
@@ -121,29 +209,30 @@ macro(add_wast_executable)
   set(target ${ARG_TARGET})
   set(DESTINATION_FOLDER ${ARG_DESTINATION_FOLDER})
 
-  compile_wast(${ARGV})
+  compile_wast_exec(${ARGV})
 
   foreach(lib ${ARG_LIBRARIES})
      list(APPEND LIBRARIES ${${lib}_BC_FILENAME})
   endforeach()
-  add_custom_command(OUTPUT ${target}.bc
-    DEPENDS ${outfiles} ${ARG_LIBRARIES} ${LIBRARIES}
-    COMMAND ${WASM_LLVM_LINK} -only-needed -o ${target}.bc ${outfiles} ${LIBRARIES}
-    COMMENT "Linking LLVM bitcode executable ${target}.bc"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    VERBATIM
-  )
 
-  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${target}.bc)
+  #add_custom_command(OUTPUT ${target}.s
+  #  DEPENDS ${outfiles} ${ARG_LIBRARIES} ${LIBRARIES}
+  #  COMMAND ${WASM_LLVM_LINK} -only-needed -o ${target}.bc ${outfiles} ${LIBRARIES}
+  #  COMMENT "Linking LLVM bitcode executable ${target}.bc"
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  #  VERBATIM
+  #)
 
-  add_custom_command(OUTPUT ${target}.s
-    DEPENDS ${target}.bc
-    COMMAND ${WASM_LLC} -thread-model=single -asm-verbose=false -o ${target}.s ${target}.bc
-    COMMENT "Generating textual assembly ${target}.s"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    VERBATIM
-  )
-  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${target}.s)
+  #set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${target}.s)
+  #
+  #  add_custom_command(OUTPUT ${target}.s
+  #    DEPENDS ${target}.bc
+  #    COMMAND ${WASM_LLC} -thread-model=single -asm-verbose=false -o ${target}.s ${target}.bc ${rt}
+  #    COMMENT "Generating textual assembly ${target}.s"
+  #    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  #    VERBATIM
+  #  )
+  #  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${target}.s)
 
   if(ARG_MAX_MEMORY)
     set(MAX_MEMORY_PARAM "-m" ${ARG_MAX_MEMORY})

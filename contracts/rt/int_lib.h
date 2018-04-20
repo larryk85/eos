@@ -28,9 +28,8 @@
 #define FNALIAS(alias, name) _Pragma("GCC error(\"alias unsupported on this file format\")")
 #define COMPILER_RT_ALIAS(aliasee) _Pragma("GCC error(\"alias unsupported on this file format\")")
 #endif
-
+#if 0
 /* ABI macro definitions */
-
 #if __ARM_EABI__
 # ifdef COMPILER_RT_ARMHF_TARGET
 #   define COMPILER_RT_ABI
@@ -40,7 +39,8 @@
 #else
 # define COMPILER_RT_ABI
 #endif
-
+#endif
+# define COMPILER_RT_ABI
 #define AEABI_RTABI __attribute__((__pcs__("aapcs")))
 
 #ifdef _MSC_VER

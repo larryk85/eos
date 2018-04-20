@@ -14,13 +14,9 @@
 
 #include "int_lib.h"
 
-#ifdef CRT_HAS_128BIT
-
 /* Returns: a * b */
 
-static
-ti_int
-__mulddi3(du_int a, du_int b)
+static void __mulddi3( __int128* ret, du_int a, du_int b)
 {
     twords r;
     const int bits_in_dword_2 = (int)(sizeof(di_int) * CHAR_BIT) / 2;
@@ -37,22 +33,25 @@ __mulddi3(du_int a, du_int b)
     r.s.low += (t & lower_mask) << bits_in_dword_2;
     r.s.high += t >> bits_in_dword_2;
     r.s.high += (a >> bits_in_dword_2) * (b >> bits_in_dword_2);
-    return r.all;
+    *ret = r.all;
 }
 
 /* Returns: a * b */
 
-COMPILER_RT_ABI void
-__multi3(ti_int a, ti_int b)
+void __multi3(__int128* ret, uint64_t al, uint64_t ah, uint64_t bl, uint64_t bh)
 {
+    twords a;
+    a.s.high = ah;
+    a.s.low  = al;
+    twords b;
+    b.s.high = bh;
+    b.s.low  = bl;
     twords x;
-    x.all = a;
+    x.all = a.all;
     twords y;
-    y.all = b;
+    y.all = b.all;
     twords r;
-    r.all = __mulddi3(x.s.low, y.s.low);
+    __mulddi3(&r.all, x.s.low, y.s.low);
     r.s.high += x.s.high * y.s.low + x.s.low * y.s.high;
-    return r.all;
+    *ret = r.all;
 }
-
-#endif /* CRT_HAS_128BIT */

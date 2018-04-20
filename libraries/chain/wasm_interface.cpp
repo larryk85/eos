@@ -1157,6 +1157,7 @@ class context_free_transaction_api : public context_aware_api {
       }
 };
 
+#if 0
 class compiler_builtins : public context_aware_api {
    public:
       using context_aware_api::context_aware_api;
@@ -1383,6 +1384,7 @@ class compiler_builtins : public context_aware_api {
 
       static constexpr uint32_t SHIFT_WIDTH = (sizeof(uint64_t)*8)-1;
 };
+#endif
 
 class math_api : public context_aware_api {
    public:
@@ -1470,6 +1472,7 @@ REGISTER_INTRINSICS(math_api,
    (i64_to_double, int64_t(int64_t)          )
 );
 
+#if 0
 REGISTER_INTRINSICS(compiler_builtins,
    (__ashlti3,     void(int, int64_t, int64_t, int)               )
    (__ashrti3,     void(int, int64_t, int64_t, int)               )
@@ -1506,6 +1509,7 @@ REGISTER_INTRINSICS(compiler_builtins,
    (__trunctfdf2,  int64_t(int64_t, int64_t)                      )
    (__trunctfsf2,  int(int64_t, int64_t)                          )
 );
+#endif
 
 REGISTER_INTRINSICS(privileged_api,
    (is_feature_active,                int(int64_t)                          )
