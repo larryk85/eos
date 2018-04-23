@@ -20,7 +20,21 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <fstream>
+#include <ratio>
+#include <ctime>
+#include <chrono>
 
+using namespace std::chrono;
+#define TB() \
+   { \
+      std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+#define TE(x) \
+   std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now(); \
+   std::chrono::duration<int64_t, std::nano> time_span = std::chrono::duration_cast<duration<int64_t, std::nano>>(t2 - t1);\
+   std::cout << "It took " << #x << ": " << time_span.count() << "ns\n"; \
+   }
+ 
 namespace eosio { namespace chain {
    using namespace contracts;
    using namespace webassembly;
@@ -85,7 +99,11 @@ class context_free_api : public context_aware_api {
       }
 
       int get_context_free_data( uint32_t index, array_ptr<char> buffer, size_t buffer_size )const {
-         return context.get_context_free_data( index, buffer, buffer_size );
+         int ret;
+         TB()
+         ret = context.get_context_free_data( index, buffer, buffer_size );
+         TE(get_context_free_data);
+         return ret;
       }
 };
 
@@ -115,7 +133,9 @@ class privileged_api : public context_aware_api {
        *  Feature name should be base32 encoded name.
        */
       void activate_feature( int64_t feature_name ) {
+         TB()
          FC_ASSERT( !"Unsupported Hardfork Detected" );
+         TE(activate_feature)
       }
 
       /**
@@ -128,10 +148,12 @@ class privileged_api : public context_aware_api {
        * @param cpu_weight - the weight for determining share of compute capacity
        */
       void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+         TB()
          EOS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
          EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
          EOS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
          context.mutable_controller.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight);
+         TE(set_resource_limits)
       }
 
       void get_resource_limits( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
@@ -1456,6 +1478,32 @@ class math_api : public context_aware_api {
          return *reinterpret_cast<uint64_t *>(&res);
       }
 };
+
+class test_api : public context_aware_api {
+   public:
+   test_api( apply_context& ctx )
+      :context_aware_api(ctx,true){}
+
+   void start_time() {
+      t1 = high_resolution_clock::now();
+   }
+   void nulll() {
+   }
+   void end_time( const char* s ) {
+      high_resolution_clock::time_point t2 = high_resolution_clock::now();
+      duration<int64_t, std::nano> time_span = duration_cast<duration<int64_t, std::nano>>(t2 - t1);
+      std::cout << "It took " << s << ": " << time_span.count() << "ns\n";
+   }
+
+   private:
+   high_resolution_clock::time_point t1;
+};
+
+REGISTER_INTRINSICS(test_api,
+   (start_time,    void()                    )
+   (nulll,         void()                    )
+   (end_time,      void(int)                 )
+);
 
 REGISTER_INTRINSICS(math_api,
    (diveq_i128,    void(int, int)            )

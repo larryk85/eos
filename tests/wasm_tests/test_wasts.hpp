@@ -16,6 +16,1033 @@ static const char f32_add_wast[] = R"=====(
  )
 )=====";
 */
+static const char test_wast[] = R"=====(
+(module
+ (table 0 anyfunc)
+ (memory $0 1)
+ (export "memory" (memory $0))
+ (export "apply" (func $apply))
+ (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+   (drop
+   (i32.load offset=4
+     (i32.const 0)
+   )
+   )
+
+ )
+)
+)=====";
+
 static const char entry_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
