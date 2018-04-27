@@ -159,15 +159,28 @@ namespace eosio { namespace chain { namespace wasm_injections {
       static constexpr bool post = false;
       static void init() { icnt = 0; }
       static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
-         // maybe change this later to variable weighting for different instruction types
          icnt++;
       }
       static uint32_t icnt;
    };
 
+   struct instruction_counter_set {
+      static constexpr bool kills = false;
+      static constexpr bool post = false;
+      static void init() { global_idx = -1; }
+      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
+         if ( global_idx == -1 ) {
+            arg.module->globals.defs.push_back({{ValueType::i32, true}, {(I32)0}});
+         }
+
+         global_idx = arg.module->globals.size()-1;
+      }
+      static int32_t global_idx = -1;
+   };
+
    struct checktime_injector {
       static constexpr bool kills = false;
-      static constexpr bool post = true;
+      static constexpr bool post = false;
       static void init() { checktime_idx = -1; }
       static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
          // first add the import for checktime
@@ -187,6 +200,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
          arg.new_code->insert( arg.new_code->end(), injected.begin(), injected.end() );
       }
       static int32_t checktime_idx;
+      static int32_t checktimed;
    };
    
    struct fix_call_index {
@@ -566,16 +580,16 @@ namespace eosio { namespace chain { namespace wasm_injections {
       using block_t           = wasm_ops::block                   <instruction_counter, checktime_injector>;
       using loop_t            = wasm_ops::loop                    <instruction_counter, checktime_injector>;
       using if__t             = wasm_ops::if_                     <instruction_counter>;
-      using else__t           = wasm_ops::else_                   <instruction_counter>;
+      using else__t           = wasm_ops::else_                   <instruction_counter, checktime_injector>;
       
-      using end_t             = wasm_ops::end                     <instruction_counter>;
+      using end_t             = wasm_ops::end                     <instruction_counter, checktime_injector>;
       using unreachable_t     = wasm_ops::unreachable             <instruction_counter>;
-      using br_t              = wasm_ops::br                      <instruction_counter>;
-      using br_if_t           = wasm_ops::br_if                   <instruction_counter>;
-      using br_table_t        = wasm_ops::br_table                <instruction_counter>;
-      using return__t         = wasm_ops::return_                 <instruction_counter>;
-      using call_t            = wasm_ops::call                    <instruction_counter>;
-      using call_indirect_t   = wasm_ops::call_indirect           <instruction_counter>;
+      using br_t              = wasm_ops::br                      <instruction_counter, checktime_injector>;
+      using br_if_t           = wasm_ops::br_if                   <instruction_counter, checktime_injector>;
+      using br_table_t        = wasm_ops::br_table                <instruction_counter, checktime_injector>;
+      using return__t         = wasm_ops::return_                 <instruction_counter, checktime_injector>;
+      using call_t            = wasm_ops::call                    <instruction_counter, checktime_injector>;
+      using call_indirect_t   = wasm_ops::call_indirect           <instruction_counter, checktime_injector>;
       using drop_t            = wasm_ops::drop                    <instruction_counter>;
       using select_t          = wasm_ops::select                  <instruction_counter>;
 
@@ -791,6 +805,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
             // initialize static fields of injectors
             injector_utils::init( mod );
             instruction_counter::init();
+            instruction_counter_set::init();
             checktime_injector::init();
          }
 
