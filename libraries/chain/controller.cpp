@@ -15,6 +15,7 @@
 
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/instruction_weight_object.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
@@ -25,7 +26,6 @@
 namespace eosio { namespace chain {
 
 using resource_limits::resource_limits_manager;
-
 
 struct pending_state {
    pending_state( database::session&& s )
@@ -52,6 +52,7 @@ struct controller_impl {
    block_state_ptr                head;
    fork_database                  fork_db;
    wasm_interface                 wasmif;
+   instruction_weights            iweights;
    resource_limits_manager        resource_limits;
    authorization_manager          authorization;
    controller::config             conf;
@@ -89,6 +90,7 @@ struct controller_impl {
     blog( cfg.block_log_dir ),
     fork_db( cfg.shared_memory_dir ),
     wasmif( cfg.wasm_runtime ),
+    iweights( db ),
     resource_limits( db ),
     authorization( s, db ),
     conf( cfg )
@@ -210,6 +212,8 @@ struct controller_impl {
       db.add_index<generated_transaction_multi_index>();
       db.add_index<scope_sequence_multi_index>();
 
+      db.add_index<instruction_weight_index>();
+
       authorization.add_indices();
       resource_limits.add_indices();
    }
@@ -315,7 +319,7 @@ struct controller_impl {
         gpo.configuration = conf.genesis.initial_configuration;
       });
       db.create<dynamic_global_property_object>([](auto&){});
-
+      iweights.initialize_database();
       authorization.initialize_database();
       resource_limits.initialize_database();
 
