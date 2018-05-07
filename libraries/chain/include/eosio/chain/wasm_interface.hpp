@@ -54,7 +54,7 @@ namespace eosio { namespace chain {
             binaryen,
          };
 
-         wasm_interface(vm_type vm);
+         wasm_interface(vm_type vm, chainbase::database& db);
          ~wasm_interface();
 
          //validates code -- does a WASM validation pass and checks the wasm against EOSIO specific constraints

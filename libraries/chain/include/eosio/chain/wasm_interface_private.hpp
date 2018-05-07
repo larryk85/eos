@@ -20,7 +20,7 @@ using namespace Runtime;
 namespace eosio { namespace chain {
 
    struct wasm_interface_impl {
-      wasm_interface_impl(wasm_interface::vm_type vm) {
+      wasm_interface_impl(wasm_interface::vm_type vm, chainbase::database& db) : _db(db) {
          if(vm == wasm_interface::vm_type::wavm)
             runtime_interface = std::make_unique<webassembly::wavm::wavm_runtime>();
          else if(vm == wasm_interface::vm_type::binaryen)
@@ -57,8 +57,8 @@ namespace eosio { namespace chain {
             } catch(Serialization::FatalSerializationException& e) {
                EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
             }
-
-            wasm_injections::wasm_binary_injection injector(module);
+            instruction_weights iw(_db);
+            wasm_injections::wasm_binary_injection injector(module, iw);
             injector.inject();
 
             std::vector<U8> bytes;
@@ -73,7 +73,8 @@ namespace eosio { namespace chain {
          }
          return it->second;
       }
-
+      
+      chainbase::database& _db;
       std::unique_ptr<wasm_runtime_interface> runtime_interface;
       map<digest_type, std::unique_ptr<wasm_instantiated_module_interface>> instantiation_cache;
    };

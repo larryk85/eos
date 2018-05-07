@@ -15,6 +15,7 @@
 
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/instruction_weights.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
@@ -88,7 +89,7 @@ struct controller_impl {
         cfg.shared_memory_size ),
     blog( cfg.block_log_dir ),
     fork_db( cfg.shared_memory_dir ),
-    wasmif( cfg.wasm_runtime ),
+    wasmif( cfg.wasm_runtime, db ),
     resource_limits( db ),
     authorization( s, db ),
     conf( cfg )
@@ -209,6 +210,7 @@ struct controller_impl {
       db.add_index<transaction_multi_index>();
       db.add_index<generated_transaction_multi_index>();
       db.add_index<scope_sequence_multi_index>();
+      db.add_index<instruction_weight_index>();
 
       authorization.add_indices();
       resource_limits.add_indices();
@@ -315,6 +317,14 @@ struct controller_impl {
         gpo.configuration = conf.genesis.initial_configuration;
       });
       db.create<dynamic_global_property_object>([](auto&){});
+      
+      auto defaults = instruction_weights::defaults();
+      for ( auto wt : enum_wrapper<weighting_type>() ) {
+         db.create<instruction_weight_object>( [&]( auto& iwo ) {
+            iwo.type = wt;
+            iwo.weight = defaults.weights[static_cast<uint16_t>(wt)];
+         });
+      }
 
       authorization.initialize_database();
       resource_limits.initialize_database();

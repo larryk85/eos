@@ -19,6 +19,11 @@
 #include "IR/Operators.h"
 #include "IR/Module.h"
 
+// forward declaration
+namespace eosio { namespace chain {
+   class instruction_weights;
+}}
+
 namespace eosio { namespace chain { namespace wasm_ops {
 
 class instruction_stream {
@@ -526,6 +531,7 @@ struct visitor_arg {
    instruction_stream* new_code;
    IR::FunctionDef*    function_def;
    size_t              start_index;
+   instruction_weights* weights;
 };
 
 struct instr {

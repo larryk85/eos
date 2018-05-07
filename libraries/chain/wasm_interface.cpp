@@ -28,7 +28,7 @@ namespace eosio { namespace chain {
    using namespace webassembly;
    using namespace webassembly::common;
 
-   wasm_interface::wasm_interface(vm_type vm) : my( new wasm_interface_impl(vm) ) {}
+   wasm_interface::wasm_interface(vm_type vm, chainbase::database& db) : my( new wasm_interface_impl(vm, db) ) {}
 
    wasm_interface::~wasm_interface() {}
 
@@ -192,7 +192,10 @@ class privileged_api : public context_aware_api {
             ma.privileged = is_priv;
          });
       }
+      void set_native_instruction_weights( array_ptr<char> packed_instruction_weights, size_t datalen ) {
+         datastream<const char*> ds( packed_instruction_weights, datalen );
 
+      }
 };
 
 class softfloat_api : public context_aware_api {
