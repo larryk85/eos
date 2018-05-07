@@ -49,21 +49,6 @@ namespace eosio { namespace chain {
       return typename enum_wrapper<T>::iterator( (static_cast<typename std::underlying_type<T>::type>(T::END) + 1 ));
    }
 
-   struct default_instruction_weights {
-      using underlying_t = typename std::underlying_type<weighting_type>::type;
-      static constexpr std::initializer_list<uint16_t> ilist { 
-         7, /* softfloat32 */
-         8, /* softfloat64 */
-         9, /* builtins_f128 */
-         4, /* builtins_i128 */
-         4, /* base instrinsic */
-         2  /* per byte */
-      }; 
-
-      static constexpr uint16_t defaults[] = ilist;
-      static underlying_t get_weight( weighting_type wt ) { return static_cast<underlying_t>(wt); }
-   };
-
    class instruction_weight_object : public chainbase::object<instruction_weight_object_type, instruction_weight_object> {
       OBJECT_CTOR(instruction_weight_object)
 
@@ -83,19 +68,29 @@ namespace eosio { namespace chain {
 
    class instruction_weights {
       public:
-         explicit instruction_weights( chainbase::database& db) : _db(db) {}
-         void initialize_database() {
+         struct defaults {
+            uint16_t weights[static_cast<uint16_t>(weighting_type::WEIGHTS_SIZE)] = {
+               7, /* softfloat32 */
+               9, /* softfloat64 */
+               11, /* builtins_f128 */
+               5, /* builtins_i128 */
+               3, /* base instrinsic */
+               2  /* per byte */
+            }; 
+         };
+         explicit instruction_weights( chainbase::database& db ) : _db(db) {
             for ( auto wt : enum_wrapper<weighting_type>() ) {
-               _db.create<instruction_weight_object>( [&]( auto& iwo ) {
-                     iwo.type = wt;
-                     iwo.weight = default_instruction_weights::get_weight(wt);
-               });
+               _weights[static_cast<uint16_t>(wt)] = _db.get<instruction_weight_object, by_weighting_type>( weighting_type::softfloat32_ops ).weight;
             }
+         }
+         inline uint16_t get_weight( const weighting_type wt ) const {
+            return _weights[static_cast<uint16_t>(wt)];
          }
 
       private:
          chainbase::database& _db;
-         uint16_t _weights[static_cast<uint16_t>(weighting_type::WEIGHTS_SIZE)] = default_instruction_weights::ilist;
+         uint16_t _weights[static_cast<uint16_t>(weighting_type::WEIGHTS_SIZE)];
+
    };
 
 }} // namespace eosio chain

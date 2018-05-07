@@ -15,7 +15,7 @@
 
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/instruction_weight_object.hpp>
+#include <eosio/chain/instruction_weights.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
@@ -52,7 +52,6 @@ struct controller_impl {
    block_state_ptr                head;
    fork_database                  fork_db;
    wasm_interface                 wasmif;
-   instruction_weights            iweights;
    resource_limits_manager        resource_limits;
    authorization_manager          authorization;
    controller::config             conf;
@@ -89,8 +88,7 @@ struct controller_impl {
         cfg.shared_memory_size ),
     blog( cfg.block_log_dir ),
     fork_db( cfg.shared_memory_dir ),
-    wasmif( cfg.wasm_runtime ),
-    iweights( db ),
+    wasmif( cfg.wasm_runtime, db ),
     resource_limits( db ),
     authorization( s, db ),
     conf( cfg )
@@ -319,7 +317,15 @@ struct controller_impl {
         gpo.configuration = conf.genesis.initial_configuration;
       });
       db.create<dynamic_global_property_object>([](auto&){});
-      iweights.initialize_database();
+      
+      auto defaults = instruction_weights::defaults();
+      for ( auto wt : enum_wrapper<weighting_type>() ) {
+         db.create<instruction_weight_object>( [&]( auto& iwo ) {
+               iwo.type = wt;
+               iwo.weight = defaults.weights[static_cast<uint16_t>(wt)];
+         });
+      }
+
       authorization.initialize_database();
       resource_limits.initialize_database();
 
@@ -1015,7 +1021,6 @@ void controller::startup() {
 
    // ilog( "${c}", ("c",fc::json::to_pretty_string(cfg)) );
    my->add_indices();
-
    my->head = my->fork_db.head();
    if( !my->head ) {
       elog( "No head block in fork db, perhaps we need to replay" );
@@ -1290,7 +1295,9 @@ const apply_handler* controller::find_apply_handler( account_name receiver, acco
 wasm_interface& controller::get_wasm_interface() {
    return my->wasmif;
 }
-
+instruction_weights controller::get_instruction_weights() {
+   return instruction_weights(my->db);
+}
 const account_object& controller::get_account( account_name name )const
 { try {
    return my->db.get<account_object, by_name>(name);

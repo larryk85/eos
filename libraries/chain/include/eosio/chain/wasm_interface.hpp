@@ -54,7 +54,7 @@ namespace eosio { namespace chain {
             binaryen,
          };
 
-         wasm_interface(vm_type vm);
+         wasm_interface(vm_type vm, chainbase::database& db);
          ~wasm_interface();
 
          //validates code -- does a WASM validation pass and checks the wasm against EOSIO specific constraints
@@ -62,7 +62,7 @@ namespace eosio { namespace chain {
 
          //Calls apply or error on a given code
          void apply(const digest_type& code_id, const shared_vector<char>& code, apply_context& context);
-
+         
       private:
          unique_ptr<struct wasm_interface_impl> my;
          friend class eosio::chain::webassembly::common::intrinsics_accessor;

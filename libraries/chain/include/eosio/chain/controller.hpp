@@ -2,6 +2,7 @@
 #include <eosio/chain/block_state.hpp>
 #include <eosio/chain/trace.hpp>
 #include <eosio/chain/genesis_state.hpp>
+
 #include <boost/signals2/signal.hpp>
 
 #include <eosio/chain/abi_serializer.hpp>
@@ -15,7 +16,7 @@ namespace chainbase {
 namespace eosio { namespace chain {
 
    class authorization_manager;
-
+   class instruction_weights;
    namespace resource_limits {
       class resource_limits_manager;
    };
@@ -166,6 +167,7 @@ namespace eosio { namespace chain {
 
          const apply_handler* find_apply_handler( account_name contract, scope_name scope, action_name act )const;
          wasm_interface& get_wasm_interface();
+         instruction_weights get_instruction_weights();
 
 
          optional<abi_serializer> get_abi_serializer( account_name n )const {

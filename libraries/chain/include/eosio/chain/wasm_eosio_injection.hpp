@@ -3,6 +3,7 @@
 #include <eosio/chain/wasm_eosio_binary_ops.hpp>
 #include <eosio/chain/wasm_eosio_constraints.hpp>
 #include <eosio/chain/webassembly/common.hpp>
+#include <eosio/chain/instruction_weights.hpp>
 #include <fc/exception/exception.hpp>
 #include <eosio/chain/exceptions.hpp>
 #include <iostream>
@@ -175,7 +176,17 @@ namespace eosio { namespace chain { namespace wasm_injections {
       static uint32_t bcnt; /* total instructions from block types */
       static std::queue<uint32_t> fcnts; 
    };
-
+   
+   template <weighting_type Weight_Type>
+   struct instruction_counter_weighted {
+      static constexpr bool kills = false;
+      static constexpr bool post = false;
+      static void init() { 
+      }
+      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
+         instruction_counter::icnt += arg.weights->get_weight( Weight_Type );
+      }
+   };
    struct checktime_block_type {
       static constexpr bool kills = false;
       static constexpr bool post = false;
@@ -800,13 +811,13 @@ namespace eosio { namespace chain { namespace wasm_injections {
       using i64_rotr_t        = wasm_ops::i64_rotr                <instruction_counter>; 
 
       // float binops 
-      using f32_add_t         = wasm_ops::f32_add                 <instruction_counter, f32_binop_injector<wasm_ops::f32_add_code>>;
-      using f32_sub_t         = wasm_ops::f32_sub                 <instruction_counter, f32_binop_injector<wasm_ops::f32_sub_code>>;
-      using f32_div_t         = wasm_ops::f32_div                 <instruction_counter, f32_binop_injector<wasm_ops::f32_div_code>>;
-      using f32_mul_t         = wasm_ops::f32_mul                 <instruction_counter, f32_binop_injector<wasm_ops::f32_mul_code>>;
-      using f32_min_t         = wasm_ops::f32_min                 <instruction_counter, f32_binop_injector<wasm_ops::f32_min_code>>;
-      using f32_max_t         = wasm_ops::f32_max                 <instruction_counter, f32_binop_injector<wasm_ops::f32_max_code>>;
-      using f32_copysign_t    = wasm_ops::f32_copysign            <instruction_counter, f32_binop_injector<wasm_ops::f32_copysign_code>>;
+      using f32_add_t         = wasm_ops::f32_add                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_add_code>>;
+      using f32_sub_t         = wasm_ops::f32_sub                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_sub_code>>;
+      using f32_div_t         = wasm_ops::f32_div                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_div_code>>;
+      using f32_mul_t         = wasm_ops::f32_mul                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_mul_code>>;
+      using f32_min_t         = wasm_ops::f32_min                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_min_code>>;
+      using f32_max_t         = wasm_ops::f32_max                 <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_max_code>>;
+      using f32_copysign_t    = wasm_ops::f32_copysign            <instruction_counter_weighted<weighting_type::f32_binary_ops>, f32_binop_injector<wasm_ops::f32_copysign_code>>;
       // float unops
       using f32_abs_t         = wasm_ops::f32_abs                 <instruction_counter, f32_unop_injector<wasm_ops::f32_abs_code>>;
       using f32_neg_t         = wasm_ops::f32_neg                 <instruction_counter, f32_unop_injector<wasm_ops::f32_neg_code>>;
@@ -907,7 +918,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
       using standard_module_injectors = module_injectors< max_memory_injection_visitor >;
 
       public:
-         wasm_binary_injection( IR::Module& mod )  : _module( &mod ) { 
+         wasm_binary_injection( IR::Module& mod, instruction_weights& iw )  : _module( &mod ), _iweights(iw) { 
             _module_injectors.init();
             // initialize static fields of injectors
             injector_utils::init( mod );
@@ -935,10 +946,10 @@ namespace eosio { namespace chain { namespace wasm_injections {
                   auto op = pre_decoder.decodeOp();
                   if (op->is_post()) {
                      op->pack(&pre_code);
-                     op->visit( { _module, &pre_code, &fd, pre_decoder.index() } );
+                     op->visit( { _module, &pre_code, &fd, pre_decoder.index(), &_iweights } );
                   }
                   else {
-                     op->visit( { _module, &pre_code, &fd, pre_decoder.index() } );
+                     op->visit( { _module, &pre_code, &fd, pre_decoder.index(), &_iweights } );
                      if (!(op->is_kill()))
                         op->pack(&pre_code);
                   }
@@ -963,10 +974,10 @@ namespace eosio { namespace chain { namespace wasm_injections {
                   }
                   if (op->is_post()) {
                      op->pack(&post_code);
-                     op->visit( { _module, &post_code, &fd, post_decoder.index() } );
+                     op->visit( { _module, &post_code, &fd, post_decoder.index(), &_iweights } );
                   }
                   else {
-                     op->visit( { _module, &post_code, &fd, post_decoder.index() } );
+                     op->visit( { _module, &post_code, &fd, post_decoder.index(), &_iweights } );
                      if (!(op->is_kill()))
                         op->pack(&post_code);
                   }
@@ -980,6 +991,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
          }
       private:
          IR::Module* _module;
+         instruction_weights& _iweights;
          static std::string op_string;
          static standard_module_injectors _module_injectors;
    };
