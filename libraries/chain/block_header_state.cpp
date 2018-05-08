@@ -235,7 +235,9 @@ namespace eosio { namespace chain {
 
   void block_header_state::sign( const std::function<signature_type(const digest_type&)>& signer ) {
      auto d = sig_digest();
+     idump((d));
      header.producer_signature = signer( d );
+     idump((header.producer_signature));
      FC_ASSERT( block_signing_key == fc::crypto::public_key( header.producer_signature, d ) );
   }
 

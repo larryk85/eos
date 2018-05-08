@@ -192,9 +192,15 @@ class privileged_api : public context_aware_api {
             ma.privileged = is_priv;
          });
       }
-      void set_native_instruction_weights( array_ptr<char> packed_instruction_weights, size_t datalen ) {
+      void set_native_instruction_weights_packed( array_ptr<char> packed_instruction_weights, size_t datalen ) {
          datastream<const char*> ds( packed_instruction_weights, datalen );
-
+         native_instruction_weights niw;
+         fc::raw::unpack(ds, niw);
+         const auto& inst_weights = context.db.get<native_instruction_weight_object>();
+         niw.version = inst_weights.weights.version + 1;
+         context.db.modify(inst_weights, [&]( auto& obj ){
+            obj.proposed_weights = niw;
+         });
       }
 };
 
@@ -1602,15 +1608,16 @@ REGISTER_INTRINSICS(compiler_builtins,
 );
 
 REGISTER_INTRINSICS(privileged_api,
-   (is_feature_active,                int(int64_t)                          )
-   (activate_feature,                 void(int64_t)                         )
-   (get_resource_limits,              void(int64_t,int,int,int)             )
-   (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
-   (set_active_producers,             int(int,int)                          )
-   (get_blockchain_parameters_packed, int(int, int)                         )
-   (set_blockchain_parameters_packed, void(int,int)                         )
-   (is_privileged,                    int(int64_t)                          )
-   (set_privileged,                   void(int64_t, int)                    )
+   (is_feature_active,                     int(int64_t)                          )
+   (activate_feature,                      void(int64_t)                         )
+   (get_resource_limits,                   void(int64_t,int,int,int)             )
+   (set_resource_limits,                   void(int64_t,int64_t,int64_t,int64_t) )
+   (set_active_producers,                  int(int,int)                          )
+   (get_blockchain_parameters_packed,      int(int, int)                         )
+   (set_blockchain_parameters_packed,      void(int,int)                         )
+   (is_privileged,                         int(int64_t)                          )
+   (set_privileged,                        void(int64_t, int)                    )
+   (set_native_instruction_weights_packed, void(int, int)                        )
 );
 
 REGISTER_INJECTED_INTRINSICS(apply_context,

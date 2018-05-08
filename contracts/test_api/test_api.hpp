@@ -240,15 +240,10 @@ struct test_checktime {
    static void checktime_pass();
    static void checktime_failure();
 };
-/*
-struct test_softfloat {
-   static void test_f32_add();
-   static void test_f32_sub();
-   static void test_f32_mul();
-   static void test_f32_div();
-   static void test_f32_min();
+
+struct test_privileged {
+  static void set_native_instruction_weights();
 };
-*/
 
 struct test_permission {
   static void check_authorization(uint64_t receiver, uint64_t code, uint64_t action);

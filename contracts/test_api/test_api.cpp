@@ -17,6 +17,7 @@
 #include "test_checktime.cpp"
 #include "test_permission.cpp"
 #include "test_datastream.cpp"
+#include "test_privileged.cpp"
 
 account_name global_receiver;
 
@@ -162,8 +163,12 @@ extern "C" {
       // test datastream
       WASM_TEST_HANDLER(test_datastream, test_basic);
 
+      // test privileged 
+      WASM_TEST_HANDLER(test_privileged, set_native_instruction_weights);
+
       // test permission
       WASM_TEST_HANDLER_EX(test_permission, check_authorization);
+
 
       //unhandled test call
       eosio_assert(false, "Unknown Test");

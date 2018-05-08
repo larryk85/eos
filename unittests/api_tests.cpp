@@ -78,6 +78,20 @@ struct test_api_action {
 FC_REFLECT_TEMPLATE((uint64_t T), test_api_action<T>, BOOST_PP_SEQ_NIL);
 
 template<uint64_t NAME>
+struct test_api_privileged_action {
+	static account_name get_account() {
+		return N(eosio.test);
+	}
+
+	static action_name get_name() {
+		return action_name(NAME);
+	}
+};
+
+FC_REFLECT_TEMPLATE((uint64_t T), test_api_privileged_action<T>, BOOST_PP_SEQ_NIL);
+
+
+template<uint64_t NAME>
 struct test_chain_action {
 	static account_name get_account() {
 		return account_name(config::system_account_name);
@@ -224,6 +238,7 @@ struct MySink : public bio::sink
    }
 };
 uint32_t last_fnc_err = 0;
+
 
 /*************************************************************************************
  * action_tests test case
@@ -1696,6 +1711,52 @@ BOOST_FIXTURE_TEST_CASE(new_api_feature_tests, TESTER) { try {
       });
 
    BOOST_REQUIRE_EQUAL( validate(), true );
+} FC_LOG_AND_RETHROW() }
+
+/*************************************************************************************
+ * instruction_weights_tests test case
+ *************************************************************************************/
+BOOST_FIXTURE_TEST_CASE(instruction_weights_tests, tester) { try {
+   produce_blocks(1);
+   create_account(N(eosio.test));
+   {
+      chainbase::database &db = control->db();
+      const account_object &account = db.get<account_object, by_name>(N(eosio.test));
+      db.modify(account, [&](account_object &v) {
+         v.privileged = true;
+      });
+   }
+   produce_blocks(1);
+   set_code(N(eosio.test), test_api_wast);
+   produce_blocks(1);
+   auto run_privileged = [&]( auto ac ) {
+      signed_transaction trx;
+      auto pl = vector<permission_level>{{N(eosio.test), config::active_name}};
+
+      action act(pl, ac);
+//      act.data = data;
+      act.authorization = {{N(eosio.test), config::active_name}};
+      trx.actions.push_back(act);
+
+      this->set_transaction_headers(trx, this->DEFAULT_EXPIRATION_DELTA);
+      auto sigs = trx.sign(this->get_private_key(N(eosio.test), "active"), chain_id_type());
+      trx.get_signature_keys(chain_id_type() );
+      auto res = this->push_transaction(trx);
+      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+      this->produce_block();
+   };
+
+   run_privileged(test_api_privileged_action<TEST_METHOD("test_privileged", "set_native_instruction_weights")>{});
+   produce_blocks(10);
+
+   /*
+   BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( *this, "test_privileged", "set_native_instruction_weights", {} ),
+      assert_exception,
+      [](const fc::exception& e) {
+         return expect_assert_message(e, "context.privileged: testapi does not have permission to call this API");
+      });
+   */
+
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

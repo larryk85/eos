@@ -26,7 +26,7 @@ extern "C" {
 
    void set_privileged( account_name account, bool is_priv );
 
-   void     set_blockchain_parameters_packed(char* data, uint32_t datalen);
+   void set_blockchain_parameters_packed(char* data, uint32_t datalen);
 
    /**
     * Retrieve the blolckchain parameters
@@ -34,7 +34,8 @@ extern "C" {
     * @param datalen - size of the data buffer, 0 to report required size.
     */
    uint32_t get_blockchain_parameters_packed(char* data, uint32_t datalen);
-
+   
+   void set_native_instruction_weights_packed(char* data, uint32_t datalen);
    void activate_feature( int64_t f );
 
    ///@ } privilegedcapi

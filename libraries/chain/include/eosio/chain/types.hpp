@@ -150,7 +150,7 @@ namespace eosio { namespace chain {
       resource_limits_config_object_type,
       account_history_object_type,
       action_history_object_type,
-      instruction_weight_object_type,
+      native_instruction_weight_object_type,
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 
@@ -219,7 +219,7 @@ FC_REFLECT_ENUM(eosio::chain::object_type,
                 (resource_limits_config_object_type)
                 (account_history_object_type)
                 (action_history_object_type)
-                (instruction_weight_object_type)
+                (native_instruction_weight_object_type)
                 (OBJECT_TYPE_COUNT)
                )
 FC_REFLECT( eosio::chain::void_t, )

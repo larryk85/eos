@@ -1,7 +1,6 @@
 #include "datastream.hpp"
 #include "memory.hpp"
 #include "privileged.hpp"
-
 void* sbrk(size_t num_bytes) {
       constexpr uint32_t NBPPL2  = 16U;
       constexpr uint32_t NBBP    = 65536U;
@@ -53,6 +52,13 @@ namespace eosio {
       eosio_assert( size <= sizeof(buf), "buffer is too small" );
       eosio::datastream<const char*> ds( buf, size_t(size) );
       ds >> params;
+   }
+
+   void set_native_instruction_weights(const eosio::native_instruction_weights& params) {
+      char buf[sizeof(eosio::native_instruction_weights)];
+      eosio::datastream<char *> ds( buf, sizeof(buf) );
+      ds << params;
+      set_native_instruction_weights_packed( buf, ds.tellp() );
    }
 
    using ::memset;

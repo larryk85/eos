@@ -15,7 +15,6 @@
 
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/instruction_weights.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
@@ -53,6 +52,7 @@ struct controller_impl {
    block_state_ptr                head;
    fork_database                  fork_db;
    wasm_interface                 wasmif;
+   native_instruction_weights     native_iweights;
    resource_limits_manager        resource_limits;
    authorization_manager          authorization;
    controller::config             conf;
@@ -172,7 +172,8 @@ struct controller_impl {
 
       FC_ASSERT( db.revision() == head->block_num, "fork database is inconsistent with shared memory",
                  ("db",db.revision())("head",head->block_num) );
-
+      
+      native_iweights = db.get<native_instruction_weight_object>().weights;
       /**
        * The undoable state contains state transitions from blocks
        * in the fork database that could be reversed. Because this
@@ -210,7 +211,7 @@ struct controller_impl {
       db.add_index<transaction_multi_index>();
       db.add_index<generated_transaction_multi_index>();
       db.add_index<scope_sequence_multi_index>();
-      db.add_index<instruction_weight_index>();
+      db.add_index<native_instruction_weight_index>();
 
       authorization.add_indices();
       resource_limits.add_indices();
@@ -316,15 +317,9 @@ struct controller_impl {
       db.create<global_property_object>([&](auto& gpo ){
         gpo.configuration = conf.genesis.initial_configuration;
       });
+
       db.create<dynamic_global_property_object>([](auto&){});
-      
-      auto defaults = instruction_weights::defaults();
-      for ( auto wt : enum_wrapper<weighting_type>() ) {
-         db.create<instruction_weight_object>( [&]( auto& iwo ) {
-            iwo.type = wt;
-            iwo.weight = defaults.weights[static_cast<uint16_t>(wt)];
-         });
-      }
+      db.create<native_instruction_weight_object>([&](auto&) {});
 
       authorization.initialize_database();
       resource_limits.initialize_database();
@@ -682,6 +677,13 @@ struct controller_impl {
          db.modify( gpo, [&]( auto& gp ) {
             gp.proposed_schedule_block_num = optional<block_num_type>();
             gp.proposed_schedule.clear();
+         });
+      }
+      const auto& niw = db.get<native_instruction_weight_object>();
+      if ( niw.proposed_weights.valid() && niw.ref_block <= pending->_pending_block_state->dpos_irreversible_blocknum ) {
+         db.modify( niw, [&]( auto& obj ) {
+            obj.weights = *niw.proposed_weights;
+            obj.proposed_weights = optional<native_instruction_weights>();
          });
       }
 
@@ -1297,6 +1299,9 @@ const apply_handler* controller::find_apply_handler( account_name receiver, acco
 }
 wasm_interface& controller::get_wasm_interface() {
    return my->wasmif;
+}
+native_instruction_weights& controller::get_native_instruction_weights() {
+   return my->native_iweights;
 }
 
 const account_object& controller::get_account( account_name name )const

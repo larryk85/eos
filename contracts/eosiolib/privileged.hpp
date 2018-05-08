@@ -4,6 +4,13 @@
 #include "types.h"
 
 namespace eosio {
+   struct native_instruction_weights {
+      uint16_t base_intrinsic;
+      uint16_t per_byte;
+      uint32_t version;
+
+      EOSLIB_SERIALIZE( native_instruction_weights, (base_intrinsic)(per_byte)(version) )
+   };
 
    struct blockchain_parameters {
       uint64_t max_block_net_usage;
@@ -53,6 +60,7 @@ namespace eosio {
 
    void get_blockchain_parameters(eosio::blockchain_parameters& params);
 
+   void set_native_instruction_weights(const eosio::native_instruction_weights& niw);
    struct producer_key {
       account_name producer_name;
       public_key   block_signing_key;

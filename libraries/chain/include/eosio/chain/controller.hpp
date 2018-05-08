@@ -6,6 +6,7 @@
 
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/account_object.hpp>
+#include <eosio/chain/instruction_weights.hpp>
 
 namespace chainbase {
    class database;
@@ -166,6 +167,7 @@ namespace eosio { namespace chain {
 
          const apply_handler* find_apply_handler( account_name contract, scope_name scope, action_name act )const;
          wasm_interface& get_wasm_interface();
+         native_instruction_weights& get_native_instruction_weights();
 
 
          optional<abi_serializer> get_abi_serializer( account_name n )const {

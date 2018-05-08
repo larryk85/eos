@@ -117,7 +117,9 @@ namespace eosio { namespace testing {
       } else {
          priv_key = private_key_itr->second;
       }
-
+      idump((priv_key));
+      idump((priv_key.sign(control->head_block_state()->sig_digest())));
+      //idump((fc::crypto::public_key(fc::crypto::signature(priv_key), control->head_block_state()->sig_digest())));
       if( !skip_pending_trxs ) {
             //wlog( "pushing all input transactions in waiting queue" );
             while( control->push_next_unapplied_transaction( fc::time_point::maximum() ) );

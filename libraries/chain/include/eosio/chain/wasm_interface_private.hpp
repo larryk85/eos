@@ -57,8 +57,8 @@ namespace eosio { namespace chain {
             } catch(Serialization::FatalSerializationException& e) {
                EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
             }
-            instruction_weights iw(_db);
-            wasm_injections::wasm_binary_injection injector(module, iw);
+            wasm_instruction_weights wiw;
+            wasm_injections::wasm_binary_injection injector(module, wiw);
             injector.inject();
 
             std::vector<U8> bytes;
