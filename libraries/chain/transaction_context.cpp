@@ -311,6 +311,31 @@ namespace eosio { namespace chain {
       deadline_exception_code = deadline_exception::code_value; // Other timeout exceptions cannot be thrown while billable timer is paused.
       pseudo_start = fc::time_point();
    }
+   
+   void transaction_context::add_to_billable_cpu_us( int64_t additional_us ) { 
+      billed_cpu_time_us += additional_us;
+      auto now = fc::time_point::now();
+      auto start = now - fc::microseconds(billed_cpu_time_us);
+      if ( (start + billing_timer_duration_limit) <= deadline ) {
+         _deadline = start += billing_timer_duration_limit;
+         deadline_exception_code = billing_timer_exception_code;
+      } else {
+         _deadline = deadline;
+         deadline_exception_code = deadline_exception::code_value;
+      }
+      //_deadline = _deadline - fc::microseconds(additional_us);
+      //billed_cpu_time += fc::microseconds(additional_us);
+      /*
+      pseudo_start = (now - billed_time);
+      if ( (pseudo_start + billing_timer_duration_limit) <= deadline ) {
+         _deadline = pseudo_start += billing_timer_duration_limit;
+         deadline_exception_code = billing_timer_exception_code;
+      } else {
+         _deadline = deadline;
+         deadline_exception_code = deadline_exception::code_value;
+      }
+      */
+   }
 
    void transaction_context::resume_billing_timer() {
       if( billed_cpu_time_us > 0 || pseudo_start != fc::time_point() ) return; // either irrelevant or already running
