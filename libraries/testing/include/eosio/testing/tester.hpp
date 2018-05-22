@@ -187,6 +187,7 @@ namespace eosio { namespace testing {
          }
 
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
+         void              set_code( account_name name, fc::time_point deadline, uint64_t max_cpu_billing, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
          void              set_abi( account_name name, const char* abi_json, const private_key_type* signer = nullptr );
 

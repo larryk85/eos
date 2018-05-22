@@ -746,6 +746,19 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
 } FC_LOG_AND_RETHROW() }
 
 /*************************************************************************************
+ * cpu_usage test case
+ *************************************************************************************/
+BOOST_AUTO_TEST_CASE(setcode_billing_test) { try {
+   TESTER t;
+   t.produce_blocks(2);
+   t.create_account( N(testapi) );
+   t.set_code( N(testapi), test_api_wast );
+   t.produce_blocks(1);
+   t.set_code( N(testapi), fc::time_point::now() + fc::time_point(fc::microseconds(10000)), 0, test_api_mem_wast );
+} FC_LOG_AND_RETHROW() }
+
+
+/*************************************************************************************
  * compiler_builtins_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(compiler_builtins_tests, TESTER) { try {

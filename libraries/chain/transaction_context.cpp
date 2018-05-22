@@ -312,29 +312,27 @@ namespace eosio { namespace chain {
       pseudo_start = fc::time_point();
    }
    
-   void transaction_context::add_to_billable_cpu_us( int64_t additional_us ) { 
-      billed_cpu_time_us += additional_us;
-      auto now = fc::time_point::now();
-      auto start = now - fc::microseconds(billed_cpu_time_us);
-      if ( (start + billing_timer_duration_limit) <= deadline ) {
-         _deadline = start += billing_timer_duration_limit;
-         deadline_exception_code = billing_timer_exception_code;
-      } else {
-         _deadline = deadline;
-         deadline_exception_code = deadline_exception::code_value;
-      }
-      //_deadline = _deadline - fc::microseconds(additional_us);
-      //billed_cpu_time += fc::microseconds(additional_us);
-      /*
-      pseudo_start = (now - billed_time);
-      if ( (pseudo_start + billing_timer_duration_limit) <= deadline ) {
+   void transaction_context::add_to_billing_timer( int64_t additional_us ) { 
+      if( billed_cpu_time_us > 0 ) return;
+      idump((pseudo_start));
+      idump((fc::microseconds(additional_us)));
+      idump((billed_time));
+      idump((_deadline));
+      idump((deadline));
+      idump((billed_cpu_time_us));
+      pseudo_start += fc::microseconds(additional_us);
+      idump((pseudo_start));
+      idump((start+fc::time_point(objective_duration_limit)));
+      idump((fc::microseconds(billing_timer_duration_limit)));
+
+      if ( (pseudo_start + billing_timer_duration_limit) <= start + objective_duration_limit ) {
+         wlog("made it here\n");
          _deadline = pseudo_start += billing_timer_duration_limit;
          deadline_exception_code = billing_timer_exception_code;
       } else {
-         _deadline = deadline;
-         deadline_exception_code = deadline_exception::code_value;
+         wlog("made it here too\n");
+         deadline_exception_code = tx_cpu_usage_exceeded::code_value;
       }
-      */
    }
 
    void transaction_context::resume_billing_timer() {

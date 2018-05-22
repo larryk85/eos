@@ -34,7 +34,7 @@ namespace eosio { namespace chain {
          void checktime()const;
 
          void pause_billing_timer();
-         void add_to_billable_cpu_us( int64_t additional_us );
+         void add_to_billing_timer( int64_t additional_us );
          void resume_billing_timer();
 
          void add_ram_usage( account_name account, int64_t ram_delta );

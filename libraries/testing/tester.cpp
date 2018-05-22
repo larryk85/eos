@@ -609,6 +609,27 @@ namespace eosio { namespace testing {
       set_code(account, wast_to_wasm(wast), signer);
    } FC_CAPTURE_AND_RETHROW( (account) )
 
+   void base_tester::set_code( account_name account, fc::time_point deadline, uint64_t max_cpu_billing, const char* wast, const private_key_type* signer) try {
+      signed_transaction trx;
+      const vector<uint8_t> wasm = wast_to_wasm(wast);
+      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
+                                setcode{
+                                   .account    = account,
+                                   .vmtype     = 0,
+                                   .vmversion  = 0,
+                                   .code       = bytes(wasm.begin(), wasm.end())
+                                });
+
+      set_transaction_headers(trx);
+      if( signer ) {
+         trx.sign( *signer, chain_id_type()  );
+      } else {
+         trx.sign( get_private_key( account, "active" ), chain_id_type()  );
+      }
+      push_transaction( trx, deadline, max_cpu_billing );
+   } FC_CAPTURE_AND_RETHROW( (account) )
+
+
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
       signed_transaction trx;

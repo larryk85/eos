@@ -126,7 +126,8 @@ void apply_eosio_setcode(apply_context& context) {
    auto  act = context.act.data_as<setcode>();
    context.require_authorization(act.account);
 //   context.require_write_lock( config::eosio_auth_scope );
-   context.trx_context.add_to_billable_cpu_us( 4000 );
+   context.trx_context.add_to_billing_timer(context.control.get_global_properties().configuration.max_transaction_cpu_usage);
+   context.trx_context.checktime();
 
    FC_ASSERT( act.vmtype == 0 );
    FC_ASSERT( act.vmversion == 0 );
