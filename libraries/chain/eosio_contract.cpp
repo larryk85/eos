@@ -126,8 +126,13 @@ void apply_eosio_setcode(apply_context& context) {
    auto  act = context.act.data_as<setcode>();
    context.require_authorization(act.account);
 //   context.require_write_lock( config::eosio_auth_scope );
-   context.trx_context.add_to_billing_timer(context.control.get_global_properties().configuration.max_transaction_cpu_usage);
-   context.trx_context.checktime();
+   idump((context.trx_context.start + fc::microseconds(context.control.get_global_properties().configuration.max_transaction_cpu_usage)));
+   idump((context.trx_context._deadline));
+   //context.trx_context._deadline =  context.trx_context.start + fc::microseconds(context.control.get_global_properties().configuration.max_transaction_cpu_usage);
+   /*
+   if (context.trx_context._deadline < context.trx_context.start + fc::microseconds(context.control.get_global_properties().configuration.max_transaction_cpu_usage))
+      ilog("WHY?!!!");
+   */
 
    FC_ASSERT( act.vmtype == 0 );
    FC_ASSERT( act.vmversion == 0 );
@@ -164,6 +169,9 @@ void apply_eosio_setcode(apply_context& context) {
    if (new_size != old_size) {
       context.trx_context.add_ram_usage( act.account, new_size - old_size );
    }
+
+   context.trx_context.add_to_cpu_billing(context.control.get_global_properties().configuration.max_transaction_cpu_usage, true);
+   context.trx_context.checktime();
 }
 
 void apply_eosio_setabi(apply_context& context) {

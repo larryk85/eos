@@ -312,29 +312,6 @@ namespace eosio { namespace chain {
       pseudo_start = fc::time_point();
    }
    
-   void transaction_context::add_to_billing_timer( int64_t additional_us ) { 
-      if( billed_cpu_time_us > 0 ) return;
-      idump((pseudo_start));
-      idump((fc::microseconds(additional_us)));
-      idump((billed_time));
-      idump((_deadline));
-      idump((deadline));
-      idump((billed_cpu_time_us));
-      pseudo_start += fc::microseconds(additional_us);
-      idump((pseudo_start));
-      idump((start+fc::time_point(objective_duration_limit)));
-      idump((fc::microseconds(billing_timer_duration_limit)));
-
-      if ( (pseudo_start + billing_timer_duration_limit) <= start + objective_duration_limit ) {
-         wlog("made it here\n");
-         _deadline = pseudo_start += billing_timer_duration_limit;
-         deadline_exception_code = billing_timer_exception_code;
-      } else {
-         wlog("made it here too\n");
-         deadline_exception_code = tx_cpu_usage_exceeded::code_value;
-      }
-   }
-
    void transaction_context::resume_billing_timer() {
       if( billed_cpu_time_us > 0 || pseudo_start != fc::time_point() ) return; // either irrelevant or already running
 
@@ -347,6 +324,16 @@ namespace eosio { namespace chain {
          _deadline = deadline;
          deadline_exception_code = deadline_exception::code_value;
       }
+   }
+
+   void transaction_context::add_to_cpu_billing( int64_t additional_us, bool clamp ) { 
+      int64_t new_billed_time = billed_time.count() + additional_us;      
+      if( billed_cpu_time_us != 0 && billed_cpu_time_us < new_billed_time ) {
+         deadline_exception_code = tx_cpu_usage_exceeded::code_value;
+         return;
+      }
+      const auto& cfg = control.get_global_properties().configuration;
+      billed_cpu_time_us = clamp ? std::min( new_billed_time, static_cast<int64_t>(cfg.max_transaction_cpu_usage) ) : new_billed_time;
    }
 
    void transaction_context::validate_cpu_usage_to_bill( int64_t billed_us, bool check_minimum )const {

@@ -34,9 +34,9 @@ namespace eosio { namespace chain {
          void checktime()const;
 
          void pause_billing_timer();
-         void add_to_billing_timer( int64_t additional_us );
          void resume_billing_timer();
 
+         void add_to_cpu_billing( int64_t additional_us, bool clamp = false );
          void add_ram_usage( account_name account, int64_t ram_delta );
 
       private:
@@ -81,7 +81,7 @@ namespace eosio { namespace chain {
          fc::microseconds              leeway = fc::microseconds(1000);
          int64_t                       billed_cpu_time_us = 0;
 
-      private:
+//      private:
          bool                          is_initialized = false;
 
 

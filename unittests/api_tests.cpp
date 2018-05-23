@@ -754,7 +754,7 @@ BOOST_AUTO_TEST_CASE(setcode_billing_test) { try {
    t.create_account( N(testapi) );
    t.set_code( N(testapi), test_api_wast );
    t.produce_blocks(1);
-   t.set_code( N(testapi), fc::time_point::now() + fc::time_point(fc::microseconds(10000)), 0, test_api_mem_wast );
+   t.set_code( N(testapi), fc::time_point::now() + fc::time_point(fc::microseconds(2000)), 0, test_api_mem_wast );
 } FC_LOG_AND_RETHROW() }
 
 
