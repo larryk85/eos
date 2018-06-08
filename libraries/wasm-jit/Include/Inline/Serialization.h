@@ -7,6 +7,7 @@
 #include <vector>
 #include <string.h>
 #include <algorithm>
+#include <iostream>
 
 namespace Serialization
 {
@@ -189,7 +190,6 @@ namespace Serialization
 			signExtendShift -= 7;
 			if(!(byte & 0x80)) { break; }
 		};
-
 		// Ensure that the input does not encode more than maxBits of data.
 		enum { numUsedBitsInLastByte = maxBits - (maxBytes-1) * 7 };
 		enum { numUnusedBitsInLast = 8 - numUsedBitsInLastByte };
