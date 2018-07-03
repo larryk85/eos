@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <fc/reflect/reflect.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <iosfwd>
 
 namespace eosio { namespace chain {
@@ -53,7 +54,21 @@ namespace eosio { namespace chain {
       name( T v ):value(v){}
       name(){}
 
-      explicit operator string()const;
+      inline explicit operator string()const {
+         // keep in sync with name::to_string() in contract definition for name
+         static const char* charmap = ".12345abcdefghijklmnopqrstuvwxyz";
+         string str(13,'.');
+
+         uint64_t tmp = value;
+         for( uint32_t i = 0; i <= 12; ++i ) {
+            char c = charmap[tmp & (i == 0 ? 0x0f : 0x1f)];
+            str[12-i] = c;
+            tmp >>= (i == 0 ? 4 : 5);
+         }
+
+         boost::algorithm::trim_right_if( str, []( char c ){ return c == '.'; } );
+         return str;
+      }
 
       string to_string() const { return string(*this); }
 
